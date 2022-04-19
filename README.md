@@ -1,24 +1,54 @@
-# xiaopopan
+### 小破盘
 
-## Project setup
-```
-npm install
-```
+本项目技术栈，前端：vue element-ui vuex vue-router
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+后端：mysql nodejs express 
 
-### Compiles and minifies for production
-```
-npm run build
-```
+后台：（正在写。。。）打算用React写
 
-### Lints and fixes files
-```
-npm run lint
-```
+[在线预览](http://drive.xiezy.top)
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+首页
+
+![](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419093325699.png)
+
+上传文件
+
+![image-20220419093505424](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419093505424.png)
+
+![image-20220419093511967](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419093511967.png)
+
+在线预览（目前只支持video/audio/image）
+
+audio
+
+![image-20220419093628996](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419093628996.png)
+
+video
+
+![](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419093648800.png)
+
+由于这个video/controls是我学js时写的，有点low，后期打算换个好用的video播放库
+
+用户中心
+
+![image-20220419093936891](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419093936891.png)
+
+
+
+登录
+
+![image-20220419094009592](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419094009592.png)
+
+***还有分享，下载......***
+
+### 下载
+
+> git clone或者下载zip包解压
+
+### run serve
+
+> npm run serve
+
+### 打包上线
+> npm run build
