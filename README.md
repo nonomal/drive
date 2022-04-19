@@ -10,35 +10,35 @@
 
 首页
 
-![](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419093325699.png)
+![](.\images\image-20220419093325699.png)
 
 上传文件
 
-![image-20220419093505424](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419093505424.png)
+![image-20220419093505424](.\images\image-20220419093505424.png)
 
-![image-20220419093511967](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419093511967.png)
+![image-20220419093511967](.\images\image-20220419093511967.png)
 
 在线预览（目前只支持video/audio/image）
 
 audio
 
-![image-20220419093628996](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419093628996.png)
+![image-20220419093628996](.\images\image-20220419093628996.png)
 
 video
 
-![](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419093648800.png)
+![](.\images\image-20220419093648800.png)
 
 由于这个video/controls是我学js时写的，有点low，后期打算换个好用的video播放库
 
 用户中心
 
-![image-20220419093936891](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419093936891.png)
+![image-20220419093936891](.\images\image-20220419093936891.png)
 
 
 
 登录
 
-![image-20220419094009592](D:\zhuomian\前端\网盘系统\xiaopopan\images\image-20220419094009592.png)
+![image-20220419094009592](.\images\image-20220419094009592.png)
 
 ***还有分享，下载......***
 
