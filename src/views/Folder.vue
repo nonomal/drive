@@ -22,7 +22,7 @@
             <FileType :data="item"></FileType>
           </div>
           <div class="title">
-            <p class="name">{{ item.name }}</p>
+            <p class="name">{{ item.file_name }}</p>
             <p class="time">{{ format("MM/DD hh:mm", item.updated_at) }}</p>
           </div>
         </div>
@@ -97,7 +97,7 @@
               </svg>
             </span>
           </div>
-          <div class="audio_name">{{ audio_info.name }}</div>
+          <div class="audio_name">{{ audio_info.file_name }}</div>
           <span @click="close">
             <i class="el-icon-close"></i>
           </span>
@@ -119,7 +119,7 @@
     <transition name="slide-fade">
       <div class="fileDetailInfo">
         <el-dialog
-          :title="fileInfo.name"
+          :title="fileInfo.file_name"
           :visible.sync="dialogFileInfo"
           width="300px"
           :before-close="detail_info_close"
@@ -132,7 +132,7 @@
             <ul>
               <li>
                 <p>
-                  <i class="el-icon-info"></i>{{ fileInfo.name
+                  <i class="el-icon-info"></i>{{ fileInfo.file_name
                   }}<span class="file_size" :title="fileInfo.file_size + 'kb'"
                     >{{ fileInfo.file_size | KbToMb }} M</span
                   >
@@ -178,7 +178,7 @@
     </div>
 
     <div class="share_url">
-      <el-dialog title="分享文件" :visible.sync="dialogShare_url" width="30%">
+      <el-dialog title="文件直链接" :visible.sync="dialogShare_url" width="30%">
         <el-dropdown @command="comm">
           <span class="el-dropdown-link">
             通过链接分享： {{ dropText
@@ -196,7 +196,7 @@
         <el-input
           style="margin-top: 20px"
           placeholder=""
-          v-model="Share_url"
+          v-model="share_url"
           :disabled="true"
         >
           <el-button
@@ -227,6 +227,7 @@ import {
 import download_file from "../utils/download";
 import { format } from "../utils/data";
 import FileType from "./File_type.vue";
+import { mapActions, mapMutations, mapState } from "vuex";
 export default {
   data() {
     return {
@@ -253,7 +254,6 @@ export default {
       dialogRename: false,
       dialogFileInfo: false,
       fileInfo: {},
-      userInfo: JSON.parse(localStorage.getItem("userInfo")),
       col_num: 8,
       currentFileId: null,
       mouse_Info: { clientX: null, clientY: null },
@@ -261,7 +261,7 @@ export default {
       disabled: true,
       shareList: ["7天有效", "15天有效", "30天有效"],
       dropText: "7天有效",
-      Share_url: "http://drive.xiezy.top/dsd32dnucgbwe29==1",
+      share_url: "http://drive.xiezy.top/dsd32dnucgbwe29==1",
       dialogShare_url: false,
       fullscreenLoading: false,
     };
@@ -277,9 +277,16 @@ export default {
   props: {
     searchFileItem: [],
   },
+  computed: {
+    ...mapState("user", ["userInfo"]),
+    ...mapState("file", ["parent_file_id", "favorite"]),
+  },
   watch: {
     searchFileItem() {
-      this.dd(this.searchFileItem);
+      this.formatFileData(this.searchFileItem);
+    },
+    userInfo() {
+      this.updateFileList();
     },
   },
   directives: {
@@ -309,6 +316,13 @@ export default {
     },
   },
   methods: {
+    ...mapMutations("file", [
+      "SET_VIDEO_INFO",
+      "SET_PARENT_FILE_ID",
+      "SET_IS_OPEN",
+      "SET_ROUTER",
+    ]),
+    ...mapActions("user", ["getUserDrive"]),
     // tree组件加载事件
     loadNode(node, resolve) {
       let file_id = "root";
@@ -343,28 +357,34 @@ export default {
     },
 
     // 设置收藏
-    collection() {
+    async collection() {
       let { file_id, isCollection } = this.List[this.clickIndex];
-      if (isCollection) {
-        isCollection = 0;
-      } else {
-        isCollection = 1;
-      }
-      setCollection({
+      if (isCollection) isCollection = 0;
+      else isCollection = 1;
+      let { status, message } = await setCollection({
         drive_id: this.userInfo.drive_id,
         file_id,
         isCollection,
-      }).then((res) => {
-        this.List[this.clickIndex].isCollection = isCollection;
-        this.$message({
-          type: "success",
-          message: res.message + "!",
-        });
       });
+      if (status == 200) {
+        this.List[this.clickIndex].isCollection = isCollection;
+        this.$message.success(message);
+      } else {
+        this.$message.error(message);
+      }
+    },
+    updateFileList() {
+      if (this.favorite == "file") {
+        this.getUserFile();
+      } else if (this.favorite == "favorite") {
+        this.getFavorite();
+      } else if (this.favorite == "album") {
+        this.getPhotos();
+      }
     },
 
     // 格式化文件数据
-    dd(data) {
+    formatFileData(data) {
       let listItem = [];
       let count = null;
       let aryLength = data.length;
@@ -380,47 +400,45 @@ export default {
     },
 
     // 加载动画
-    openFullScreen1() {
+    async openFullScreen1() {
       let { type, file_id } = this.List[this.clickIndex];
-      let created_at = format("YYYY-MM-DD hh:mm:ss");
-      if (type == "folder") {
-        this.$notify({
+      if (type == "folder")
+        return this.$notify({
           title: "警告",
           message: "文件夹暂不支持分享",
           type: "info",
         });
-        return;
-      }
       this.fullscreenLoading = true;
-      getShareUrl({
+      let { share_url, message, status } = await getShareUrl({
         drive_id: this.userInfo.drive_id,
         file_id,
         type,
-        created_at,
-      })
-        .then((res) => {
-          this.Share_url = res.data.share_url;
-          this.$message({ type: "success", message: res.message + "!" });
-          this.dialogShare_url = true;
-        })
-        .catch((err) => {
-          this.$message({ type: "success", message: err.message + "!" });
-          this.dialogShare_url = false;
-        });
+      });
+      if (status == 200) {
+        this.share_url = share_url;
+        this.$message({ type: "success", message });
+        this.dialogShare_url = true;
+      } else {
+        this.$message({ type: "error", message });
+        this.dialogShare_url = false;
+      }
       this.fullscreenLoading = false;
     },
 
     // 点击复制
     copy() {
-      let input = document.createElement("input");
-      input.value = this.Share_url;
-      input.style.opacity = 0;
-      document.body.appendChild(input);
-      input.select(); // 选中文本
-      console.log(input.value);
-      document.execCommand("copy"); // 执行浏览器复制命令
-      input.remove();
-      this.$notify({ title: "成功", message: "复制成功", type: "success" });
+      navigator.clipboard
+        .readText(this.share_url)
+        .then(() =>
+          this.$notify({ title: "成功", message: "复制成功", type: "success" })
+        )
+        .catch(() =>
+          this.$notify({
+            title: "失败",
+            message: "复制失败!请手动复制",
+            type: "error",
+          })
+        );
       this.dialogShare_url = !this.dialogShare_url;
     },
 
@@ -432,7 +450,7 @@ export default {
     // 获取用户文件
     getUserFile(
       drive_id = this.userInfo.drive_id,
-      parent_file_id = this.$store.state.parent_file_id
+      parent_file_id = this.parent_file_id
     ) {
       getFile({
         drive_id,
@@ -440,8 +458,8 @@ export default {
         page: 1,
         parent_file_id,
       }).then((res) => {
-        this.List = res.data;
-        this.dd(res.data);
+        this.List = res.fileList;
+        this.formatFileData(res.fileList);
       });
     },
 
@@ -449,7 +467,7 @@ export default {
     getFavorite() {
       getCollection({ drive_id: this.userInfo.drive_id }).then((res) => {
         this.List = res.data;
-        this.dd(res.data);
+        this.formatFileData(res.data);
       });
     },
 
@@ -457,63 +475,51 @@ export default {
     getPhotos() {
       getPhoto({ drive_id: this.userInfo.drive_id }).then((res) => {
         this.List = res.data;
-        this.dd(res.data);
+        this.formatFileData(res.data);
       });
     },
     // 鼠标右键菜单
     handelMenu(index, key, e) {
+      e.preventDefault();
       this.clickIndex = this.col_num * key + index;
       this.clickKey = key;
       this.clickOrIndex = index;
-      e.preventDefault();
-      let { name, type, isCollection } = this.List[this.clickIndex];
-      this.mkdirName = name;
-      if (type == "folder") {
-        this.isFolder = true;
-      } else {
-        this.isFolder = false;
-      }
-      if (isCollection == "0") {
-        this.collectionText = "收藏";
-      } else {
-        this.collectionText = "取消收藏";
-      }
-
+      let { file_name, type, isCollection } = this.List[this.clickIndex];
+      this.mkdirName = file_name;
+      if (type == "folder") this.isFolder = true;
+      else this.isFolder = false;
+      if (isCollection == "0") this.collectionText = "收藏";
+      else this.collectionText = "取消收藏";
       this.menuShow = !this.menuShow;
       let Ele = this.menuEle;
       Ele.style.left = e.clientX - 10 + "px";
       Ele.style.top = e.clientY + 20 + "px";
     },
-
     handel() {},
 
     // 删除文件
     delFile() {
       var that = this;
-      let drive_id = this.userInfo.drive_id;
-      let file_id = this.List[this.clickIndex].file_id;
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
-          delFile({ file_id, drive_id })
-            .then((res) => {
+          delFile({
+            file_id: this.List[this.clickIndex].file_id,
+            drive_id: this.userInfo.drive_id,
+          })
+            .then(async (res) => {
               that.fileList[this.clickKey].splice(
                 that.clickOrIndex,
                 that.clickOrIndex + 1
               );
-              this.$message({
-                type: "success",
-                message: res.message + "!",
-              });
+              this.$message.success(res.message);
+              await this.getUserDrive();
             })
             .catch((err) => {
-              this.$message({
-                type: "error",
-                message: err.message + "!",
-              });
+              this.$message.error(err.message);
             });
         })
         .catch(() => {});
@@ -524,28 +530,26 @@ export default {
       let { type, file_id, name } = item;
       if (type == "folder") {
         this.getUserFile(this.userInfo.drive_id, file_id);
-        this.$store.state.parent_file_id = file_id;
-        this.$store.commit("parent_file_id", file_id);
-        this.$store.commit("add_router", { name, path: file_id });
+        this.SET_PARENT_FILE_ID(file_id);
+        this.SET_ROUTER({ name, path: file_id });
       } else if (type.includes("video") || type.includes("image")) {
-        this.$store.state.video_info = item;
-        this.$store.state.isOpen = true;
+        this.SET_VIDEO_INFO(item);
+        this.SET_IS_OPEN(true);
       } else if (type.includes("audio")) {
         this.audio_play = true;
         this.audio_info = item;
       } else if (type.includes("search")) {
-        this.$store.state.parent_file_id = file_id;
-        this.$store.commit("parent_file_id", file_id);
-        this.$store.commit("add_router", { name, path: file_id });
+        this.SET_PARENT_FILE_ID(file_id);
+        this.SET_ROUTER({ name, path: file_id });
       }
     },
 
     // 下载
     download_url() {
-      let { file_id, name } = this.List[this.clickIndex];
+      let { file_id, file_name } = this.List[this.clickIndex];
       downloadFile(file_id)
         .then((res) => {
-          download_file(res.data, name);
+          download_file(res.data, file_name);
         })
         .catch((err) => {
           console.log("error", err);
@@ -555,62 +559,43 @@ export default {
     // 重命名
     modify_name() {
       this.dialogRename = true;
-      let name = this.List[this.clickIndex].name;
-      this.reName = name;
+      this.reName = this.List[this.clickIndex].file_name;
     },
 
     // 重命名
-    re_name() {
-      let { drive_id } = this.$store.state.userInfo;
+    async re_name() {
+      let { drive_id } = this.userInfo;
       let { file_id, type } = this.List[this.clickIndex];
-      let updated_at = format("YYYY-MM-DD hh:mm:ss");
-      modify({
+      let { status, message } = await modify({
         drive_id,
         file_id,
         filename: this.reName,
         type,
-        updated_at,
-      })
-        .then((res) => {
-          this.$message({
-            type: "success",
-            message: res.message + "!",
-          });
-          this.getUserFile();
-        })
-        .catch((err) => {
-          this.$message({
-            type: "error",
-            message: err.message + "!",
-          });
-        });
+        updated_at: format("YYYY-MM-DD hh:mm:ss"),
+      });
+      if (status == 200) {
+        this.$message.success(message);
+        this.getUserFile();
+      } else {
+        this.$message.error(message);
+      }
       this.dialogRename = false;
     },
 
     // 移动文件
     move_action() {
-      let { drive_id } = this.$store.state.userInfo;
-      let { file_id } = this.List[this.clickIndex];
-
-      let updated_at = format("YYYY-MM-DD hh:mm:ss");
       move({
-        drive_id,
+        drive_id: this.userInfo.drive_id,
         parent_file_id: this.currentFileId,
-        updated_at,
-        file_id,
+        updated_at: format("YYYY-MM-DD hh:mm:ss"),
+        file_id: this.List[this.clickIndex].file_id,
       })
         .then((res) => {
-          this.$message({
-            type: "success",
-            message: res.message + "!",
-          });
+          this.$message.success(res.message);
           this.getUserFile();
         })
         .catch((err) => {
-          this.$message({
-            type: "error",
-            message: err.message + "!",
-          });
+          this.$message.error(err.message);
         });
       this.dialogMove = false;
       this.disabled = true;
@@ -666,6 +651,7 @@ export default {
     close() {
       this.audio_play = false;
       this.audioEle.pause();
+      this.audioPaused = true;
       this.sliderEle.style.left = 0;
     },
 
@@ -706,13 +692,11 @@ export default {
     this.sliderEle = this.$refs.slider;
     this.audioEle.addEventListener("canplaythrough", this.init_audio_time);
     this.audioEle.addEventListener("end", this.audioEnd);
-    if (this.$store.state.favorite == "file") {
-      this.getUserFile();
-    } else if (this.$store.state.favorite == "favorite") {
-      this.getFavorite();
-    } else if (this.$store.state.favorite == "album") {
-      this.getPhotos();
-    }
+    this.updateFileList();
+  },
+  destroyed() {
+    this.audioEle.removeEventListener("canplaythrough", this.init_audio_time);
+    this.audioEle.removeEventListener("end", this.audioEnd);
   },
 };
 </script>

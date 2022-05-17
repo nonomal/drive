@@ -23,10 +23,9 @@
     </el-col>
     <div class="footer">
       <div class="content">
-        <span
-          >{{ userInfo.drive_used | getBToMB }}MB/{{
-            userInfo.drive_size | getBToGB
-          }}GB</span
+        <span>
+          {{ userInfo.drive_used | getBToMB }}
+          MB/{{ userInfo.drive_size | getBToGB }}GB</span
         >
         <el-progress
           v-if="!isNaN(percentage)"
@@ -52,6 +51,7 @@
                 type="file"
                 ref="fileEle"
                 @change="uploadFile"
+                accept="image/*"
                 style="display: none"
               />
               <li @click="modify_nick">修改昵称</li>
@@ -79,22 +79,22 @@
     </div>
     <div class="modfityPass">
       <el-dialog title="修改密码" :visible.sync="dialogFormVisible" width="40%">
-        <el-form>
-          <el-form-item label="原密码" :label-width="formLabelWidth">
+        <el-form :model="modify" :rules="rules" ref="modifyPass">
+          <el-form-item label="原密码" label-width="120px" prop="oldPass">
             <el-input
               v-model="modify.oldPass"
               autocomplete="off"
               placeholder="请输入原密码"
             ></el-input>
           </el-form-item>
-          <el-form-item label="新密码" :label-width="formLabelWidth">
+          <el-form-item label="新密码" label-width="120px" prop="oldPass">
             <el-input
               v-model="modify.newPass"
               autocomplete="off"
               placeholder="请输入新密码"
             ></el-input>
           </el-form-item>
-          <el-form-item label="确认密码" :label-width="formLabelWidth">
+          <el-form-item label="确认密码" label-width="120px" prop="oldPass">
             <el-input
               v-model="modify.conPass"
               autocomplete="off"
@@ -104,7 +104,9 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="updataPass">确 定</el-button>
+          <el-button type="primary" @click="updataPass('modifyPass')"
+            >确 定</el-button
+          >
         </div>
       </el-dialog>
     </div>
@@ -112,10 +114,10 @@
 </template>
 
 <script>
-import { getUserInfo, modifyNick, modifyPass } from "../api/users";
+import { modifyNick, modifyPass } from "../api/users";
 import { uploadHeadImg } from "../api/file";
 import { getPassMD5 } from "../utils/cryto";
-import { Message } from "element-ui"; //MessageBox
+import { mapState } from "vuex";
 export default {
   data() {
     return {
@@ -139,7 +141,6 @@ export default {
       ],
       nickNameDialog: false,
       dialogFormVisible: false,
-      formLabelWidth: "120px",
       modify: {
         newPass: null,
         conPass: null,
@@ -147,7 +148,17 @@ export default {
       },
       nickname: null,
       customColor: "",
-      userInfo: {},
+      rules: {
+        oldPass: [
+          { required: true, message: "密码是必须的", trigger: "blur" },
+          {
+            min: 8,
+            max: 14,
+            message: "长度不对哦！长度应在8-14之间",
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   computed: {
@@ -157,6 +168,7 @@ export default {
       this.percentageStatua(result);
       return result > 1 ? 1 : result;
     },
+    ...mapState("user", ["userInfo"]),
   },
   filters: {
     getBToMB(num) {
@@ -183,29 +195,31 @@ export default {
 
     // 上传头像
     handel() {
-      let Ele = this.$refs.fileEle;
-      Ele.click();
+      this.$refs.fileEle.click();
     },
 
     // 上传头像
     uploadFile(e) {
-      var that = this;
+      let that = this;
       var files = e.target.files[0];
+      if (!files) return false;
+      if (files.size > 5 * 1024 * 1024)
+        return this.$message.warning("仅支持5M以内图片");
+      if (!files.type.includes("image"))
+        return this.$message.warning("仅支持image/*图片");
       var filename = files.name;
       var reader = new FileReader();
       var { drive_id } = this.userInfo;
-      reader.onload = function () {
-        let chunk = reader.result;
-        uploadHeadImg({ chunk, filename, drive_id })
-          .then(() => {
-            getUserInfo({ drive_id }).then((res) => {
-              that.userInfo = res.data[0];
-              localStorage.setItem("userInfo", JSON.stringify(res.data[0]));
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+      reader.onload = async function () {
+        let { head_img_url, message, status } = await uploadHeadImg({
+          chunk: reader.result,
+          filename,
+          drive_id,
+        });
+        if (status == 200) {
+          that.$message({ type: "success", message });
+          that.userInfo.headImg = head_img_url;
+        }
       };
       reader.readAsDataURL(files);
     },
@@ -221,16 +235,21 @@ export default {
       modifyNick({
         drive_id: this.userInfo.drive_id,
         nickname: this.nickname,
-      }).then(() => {
-        // 修改成功重新获取用户信息
-        getUserInfo({ drive_id: this.userInfo.drive_id }).then((res) => {
-          this.userInfo = res.data;
-          console.log(res.data);
+      })
+        .then((data) => {
+          let { status, message } = data;
+          if (status == 200) {
+            this.$message.success(message);
+            this.userInfo.nickname = this.nickname;
+            // 关闭遮罩层
+            this.nickNameDialog = !this.nickNameDialog;
+          } else {
+            this.$message.warning(message);
+          }
+        })
+        .catch((err) => {
+          this.$message.warning(err.message);
         });
-
-        // 关闭遮罩层
-        this.nickNameDialog = !this.nickNameDialog;
-      });
     },
 
     // 修改密码
@@ -239,38 +258,32 @@ export default {
     },
 
     // 修改密码
-    updataPass() {
-      if (this.modify.newPass === this.modify.conPass && this.modify.oldPass) {
-        this.dialogFormVisible = false;
-        let { drive_id } = this.userInfo;
-        let newPass = getPassMD5(this.modify.newPass);
-        modifyPass({
-          password: newPass,
-          drive_id,
-        }).then((res) => {
-          console.log(res);
-        });
-      } else {
-        Message({
-          message: "两次密码不相同",
-          type: "error",
-          duration: 2 * 1000,
-        });
-      }
+    updataPass(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid && this.modify.newPass === this.modify.conPass) {
+          this.dialogFormVisible = false;
+          let { drive_id } = this.userInfo;
+          modifyPass({
+            password: getPassMD5(this.modify.newPass),
+            drive_id,
+          }).then((res) => {
+            let { status, message } = res;
+            if (status == 200) {
+              this.$message.success(message);
+              localStorage.removeItem("token");
+              this.$router.replace("/login");
+            } else {
+              this.$message.error(message);
+            }
+          });
+        }
+      });
     },
-
     // 退出
     loginOut() {
       localStorage.removeItem("token");
-      this.$router.replace({ path: "/" });
+      this.$router.replace({ path: "/login" });
     },
-  },
-  mounted() {
-    getUserInfo({ drive_id: this.$store.state.userInfo.drive_id }).then(
-      (res) => {
-        this.userInfo = res.data[0];
-      }
-    );
   },
 };
 </script>

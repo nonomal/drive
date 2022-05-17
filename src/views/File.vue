@@ -41,7 +41,7 @@
     </el-row>
     <div class="breadcrumb">
       <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item v-for="(item, index) in breadcrumb" :key="index">
+        <el-breadcrumb-item v-for="(item, index) in routers" :key="index">
           <span class="nav_link" @click="goBack(item, index)">{{
             item.name
           }}</span>
@@ -146,16 +146,11 @@
 </template>
 
 <script>
-import {
-  uploadFiles,
-  mkdir,
-  merge,
-  getUserUsedDrive,
-  getSearch,
-} from "../api/file";
+import { uploadFiles, mkdir, merge, getSearch } from "../api/file";
 import { format } from "../utils/data";
 import { getMD5 } from "../utils/cryto";
 import Folder from "./Folder.vue";
+import { mapActions, mapMutations, mapState } from "vuex";
 export default {
   data() {
     return {
@@ -169,7 +164,6 @@ export default {
       menuEle: null,
       arryCheck: [],
       clickIndex: null,
-      userInfo: JSON.parse(localStorage.getItem("userInfo")),
       centerDialogVisible: false,
       dirParams: {
         dir_name: "新建文件夹",
@@ -197,27 +191,17 @@ export default {
     Folder,
   },
   computed: {
-    breadcrumb() {
-      return this.$store.state.routers;
-    },
+    ...mapState("user", ["userInfo"]),
+    ...mapState("file", ["routers", "parent_file_id"]),
   },
   methods: {
     // 上传文件
     async upload(e) {
-      let {
-        data: [drive_used, drive_size],
-      } = await getUserUsedDrive(this.$store.state.userInfo);
-
-      let info = JSON.parse(localStorage.getItem("userInfo"));
-      info.drive_used = drive_used;
-      info.drive_size = drive_size;
-      localStorage.setItem("userInfo", JSON.stringify(info));
-
-      if (drive_used >= drive_size) {
-        this.$message.error("当前账户可用空间不足");
-        return;
-      }
+      let { drive_used, drive_size } = this.userInfo;
+      if (drive_used >= drive_size)
+        return this.$message.error("当前账户可用空间不足");
       var file = e.target.files[0];
+      if (!file) return;
       this.upload_name = file.name;
       let start = 0;
       while (start <= file.size) {
@@ -226,10 +210,8 @@ export default {
         let blob = file.slice(start, start + this.chunkSize);
         let blob_name = `${f_name}.${this.total}.${f_ext}`;
         let bolo_file = new File([blob], blob_name);
-
         this.partList.push(bolo_file);
         this.total += 1;
-
         if (start >= file.size) {
           break;
         }
@@ -265,13 +247,12 @@ export default {
     mergeFile(e) {
       var files = e.target.files[0];
       var name = files.name;
-      var that = this;
       var file_id = getMD5(name);
       var file_size = files.size;
       var file_type = files.type;
       let time = format("YYYY-MM-DD hh:mm:ss");
-      let { drive_id } = this.$store.state.userInfo;
-      let parent_file_id = this.$store.state.parent_file_id;
+      let { drive_id } = this.userInfo;
+      let parent_file_id = this.parent_file_id;
       merge({
         drive_id,
         file_id,
@@ -281,12 +262,9 @@ export default {
         file_type,
         created_at: time,
         updated_at: time,
-      }).then((res) => {
-        that.$refs.folder.getUserFile();
-        this.$message({
-          type: "success",
-          message: res.message + "!",
-        });
+      }).then(async (res) => {
+        await this.getUserDrive();
+        this.$message.success(res.message);
       });
       this.upload_Ele = false;
       this.total = 0;
@@ -296,10 +274,10 @@ export default {
 
     // 创建文件夹
     mkdir_btn() {
-      let { drive_id } = this.$store.state.userInfo;
+      let { drive_id } = this.userInfo;
       let time = format("YYYY-MM-DD hh:mm:ss");
       let { dir_name, type } = this.dirParams;
-      let parent_file_id = this.$store.state.parent_file_id;
+      let parent_file_id = this.parent_file_id;
       let file_id = getMD5(parent_file_id + dir_name);
       mkdir({
         drive_id,
@@ -333,31 +311,38 @@ export default {
 
     // 搜索文件
     searchFile() {
-      this.$refs.folder.open({
+      this.SET_ROUTER({
         name: `${this.searchWord}的搜索结果`,
-        file_id: "xiezy",
-        type: "search",
+        path: Date.now(),
       });
-      let { drive_id } = this.$store.state.userInfo;
-      getSearch({ searchWord: this.searchWord, drive_id }).then((res) => {
+      getSearch({
+        searchWord: this.searchWord,
+        drive_id: this.userInfo.drive_id,
+      }).then((res) => {
+        this.searchWord = "";
         this.searchFileItem = res.data;
       });
     },
 
     // 导航后退
     goBack(item, index) {
-      // if(index == 0) index+=1
-      this.$store.state.parent_file_id = item.path;
-      this.$store.commit("del_router", index);
+      this.SET_PARENT_FILE_ID(item.path);
+      this.REMOVE_ROUTER(index + 1);
       this.$refs.folder.getUserFile();
     },
+    ...mapMutations("file", [
+      "REMOVE_ROUTER",
+      "SET_PARENT_FILE_ID",
+      "SET_FAVORITE",
+      "SET_ROUTER",
+    ]),
+    ...mapActions("user", ["getUserDrive"]),
   },
   created() {
-    this.$store.commit("setFavorite", "file");
+    this.SET_FAVORITE("file");
   },
   mounted() {
     this.menuEle = this.$refs.fileMenu;
-    this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
   },
 };
 </script>

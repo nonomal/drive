@@ -1,25 +1,27 @@
 <template>
-    <div class="favorite">
-        <Folder/>
-    </div>
+  <div class="favorite">
+    <Folder />
+  </div>
 </template>
 
 <script>
-import Folder from './Folder.vue'
+import { mapMutations } from "vuex";
+import Folder from "./Folder.vue";
 export default {
-    data(){
-        return{
-        }
-    },
-    components:{
-        Folder
-    },
-    created(){
-        this.$store.commit('setFavorite','favorite')
-    }
-}
+  data() {
+    return {};
+  },
+  components: {
+    Folder,
+  },
+  methods: {
+    ...mapMutations("file", ["SET_FAVORITE"]),
+  },
+  created() {
+    this.SET_FAVORITE("favorite");
+  },
+};
 </script>
 
 <style>
-
 </style>

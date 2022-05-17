@@ -1,19 +1,23 @@
 <template>
-<div class="album">
-    <Folder/>
-</div>
+  <div class="album">
+    <Folder />
+  </div>
 </template>
 
 <script>
-import Folder from './Folder.vue'
+import { mapMutations } from "vuex";
+import Folder from "./Folder.vue";
 export default {
-    components:{
-        Folder
-    },
-    created(){
-        this.$store.commit('setFavorite','album')
-    },
-}
+  components: {
+    Folder,
+  },
+  methods: {
+    ...mapMutations("file", ["SET_FAVORITE"]),
+  },
+  created() {
+    this.SET_FAVORITE("album");
+  },
+};
 </script>
 
 <style>
