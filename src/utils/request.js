@@ -1,7 +1,7 @@
 import axios from 'axios'
 import app from '../main'
-// axios.defaults.baseURL = 'http://localhost:3000'
-axios.defaults.baseURL = 'http://drive_node.xiezy.top'
+axios.defaults.baseURL = 'http://localhost:3000'
+// axios.defaults.baseURL = ''
 
 let instance = axios.create()
 instance.interceptors.request.use(config => {

@@ -48,6 +48,10 @@ const routes = [
         component: () => import('../views/Favorite.vue')
       }
     ]
+  }, {
+    path: '/modifyCipher',
+    name: 'modifyCipher',
+    component: () => import('../views/modifyCipher.vue')
   }
 ]
 

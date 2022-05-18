@@ -2,7 +2,7 @@ import request from '../utils/request'
 
 function getShareUrl(params) {
     return new Promise((resolve, reject) => {
-        request.post('/share/getShareUrl', params).then(response => {
+        request.post('/api/share/getShareUrl', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -11,7 +11,7 @@ function getShareUrl(params) {
 }
 function getYiYan() {
     return new Promise((resolve, reject) => {
-        request.get('/share/yiyan').then(response => {
+        request.get('/yiyan/getYiyan').then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)

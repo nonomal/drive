@@ -3,7 +3,7 @@ import axios from 'axios'
 
 function getFile(params) {
     return new Promise((resolve, reject) => {
-        request.get('/file/getFile', {
+        request.get('/api/file/getFile', {
             params: params
         }).then(response => {
             resolve(response)
@@ -15,7 +15,7 @@ function getFile(params) {
 
 function uploadFiles(params) {
     return new Promise((resolve, reject) => {
-        request.post('/file/upload', params).then(response => {
+        request.post('/api/file/upload', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -24,7 +24,7 @@ function uploadFiles(params) {
 }
 function merge(params) {
     return new Promise((resolve, reject) => {
-        request.post('/file/merge', params).then(response => {
+        request.post('/api/file/merge', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -34,7 +34,7 @@ function merge(params) {
 
 function uploadHeadImg(params) {
     return new Promise((resolve, reject) => {
-        request.post('/file/uploadHeadImg', params).then(response => {
+        request.post('/api/file/uploadHeadImg', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -44,7 +44,7 @@ function uploadHeadImg(params) {
 
 function delFile(params) {
     return new Promise((resolve, reject) => {
-        request.get('/file/delFile', { params }).then(response => {
+        request.get('/api/file/delFile', { params }).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -54,7 +54,7 @@ function delFile(params) {
 
 function mkdir(params) {
     return new Promise((resolve, reject) => {
-        request.post('/file/mkdir', params).then(response => {
+        request.post('/api/file/mkdir', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -64,7 +64,7 @@ function mkdir(params) {
 
 function modify(params) {
     return new Promise((resolve, reject) => {
-        request.post('/file/modify', params).then(response => {
+        request.post('/api/file/modify', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -74,7 +74,7 @@ function modify(params) {
 
 function move(params) {
     return new Promise((resolve, reject) => {
-        request.post('/file/move', params).then(response => {
+        request.post('/api/file/move', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -84,7 +84,7 @@ function move(params) {
 
 function getUserUsedDrive(params) {
     return new Promise((resolve, reject) => {
-        request.post('/file/getUsedDrive', params).then(response => {
+        request.post('/api/file/getUsedDrive', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -94,7 +94,7 @@ function getUserUsedDrive(params) {
 
 function getSearch(params) {
     return new Promise((resolve, reject) => {
-        request.post('/file/search', params).then(response => {
+        request.post('/api/file/search', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -104,7 +104,7 @@ function getSearch(params) {
 
 function getFolder(params) {
     return new Promise((resolve, reject) => {
-        request.post('/file/getFolder', params).then(response => {
+        request.post('/api/file/getFolder', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -114,7 +114,7 @@ function getFolder(params) {
 
 function getCollection(params) {
     return new Promise((resolve, reject) => {
-        request.post('/file/getCollection', params).then(response => {
+        request.post('/api/file/getCollection', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -124,7 +124,7 @@ function getCollection(params) {
 
 function setCollection(params) {
     return new Promise((resolve, reject) => {
-        request.post('/file/setCollection', params).then(response => {
+        request.post('/api/file/setCollection', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
@@ -134,7 +134,7 @@ function setCollection(params) {
 
 function getPhoto(params) {
     return new Promise((resolve, reject) => {
-        request.post('/file/getPhoto', params).then(response => {
+        request.post('/api/file/getPhoto', params).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)

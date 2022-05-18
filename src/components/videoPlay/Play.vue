@@ -1,29 +1,40 @@
 <template>
   <div class="video_play" v-show="isOpen" ref="video_play">
     <el-row :gutter="20">
-      <el-col :span="6"><i class="el-icon-close" @click="video_pause" style="cursor: pointer;"></i></el-col>
-      <el-col :span="6" :offset="3" style="text-align: center;">
+      <el-col :span="6"
+        ><i
+          class="el-icon-close"
+          @click="video_pause"
+          style="cursor: pointer"
+        ></i
+      ></el-col>
+      <el-col :span="6" :offset="3" style="text-align: center">
         <span class="video_name">{{ name }}</span>
       </el-col>
     </el-row>
     <el-row>
       <el-col>
-        <div class="view" id='vb' v-show="type.includes('video')">
-          <video id="vd" :src="src" playsinline webkit-playsinline="true"></video>
+        <div class="view" id="vb" v-show="type.includes('video')">
+          <video
+            id="vd"
+            :src="src"
+            playsinline
+            webkit-playsinline="true"
+          ></video>
           <div class="video-status" id="log">
             <i class="controlBar"><span class="dian"></span></i>
             <i class="play iconfont icon-bofang"></i>
             <span class="currentTime"></span>&nbsp;&nbsp;/&nbsp;&nbsp;
             <span class="druation"></span>
             <div class="controlRight">
-                <i class="audio iconfont icon-shengyin" title="音量"></i>
-                <i class="fullScree iconfont icon-quanping1" title="全屏"></i>
-                <i class="set iconfont icon-shezhi" title="设置"></i>
+              <i class="audio iconfont icon-shengyin" title="音量"></i>
+              <i class="fullScree iconfont icon-quanping1" title="全屏"></i>
+              <i class="set iconfont icon-shezhi" title="设置"></i>
             </div>
           </div>
         </div>
         <div class="images" v-show="type.includes('image')">
-          <img :src="src">
+          <img :src="src" />
         </div>
       </el-col>
     </el-row>
@@ -31,6 +42,7 @@
 </template>
 
 <script>
+import { mapMutations, mapState } from "vuex";
 export default {
   data() {
     return {
@@ -44,33 +56,31 @@ export default {
       dianDom: null,
       currentTimeDom: null,
       druationDom: null,
-      video_play:null,
-      src:null,
-      name:null,
-      type:''
+      video_play: null,
+      src: null,
+      name: null,
+      type: "",
     };
   },
-  computed:{
-    isOpen(){
-        return this.$store.state.isOpen
+  computed: {
+    ...mapState("file", ["isOpen"]),
+    video_info() {
+      return this.$store.state.video_info;
     },
-    video_info(){
-        return this.$store.state.video_info
-    }
   },
-  watch:{
-      video_info(){
-          this.src = this.video_info.download_url
-          this.name = this.video_info.name
-          this.type = this.video_info.type
-      },
-      isOpen(val){
-          if(val){
-              this.video_play.style.zIndex = 2
-          }else{
-              this.video_play.style.zIndex = -1
-          }
+  watch: {
+    video_info() {
+      this.src = this.video_info.download_url;
+      this.name = this.video_info.name;
+      this.type = this.video_info.type;
+    },
+    isOpen(val) {
+      if (val) {
+        this.video_play.style.zIndex = 2;
+      } else {
+        this.video_play.style.zIndex = -1;
       }
+    },
   },
   methods: {
     debouce(func, delay, immediate) {
@@ -115,44 +125,44 @@ export default {
       if (timer) {
         clearTimeout(timer);
       }
-      timer = setTimeout(()=>{
+      timer = setTimeout(() => {
         this.log.style.bottom = "-40px";
-        this.videoBox.style.cursor = 'none'
+        this.videoBox.style.cursor = "none";
       }, 3000);
     },
 
     fullScreeVideo(e) {
-      e.stopPropagation()
-        let timer;
-        if (!this.checkFull()) {
-            this.videoBox.requestFullscreen();
-            this.videoDom.style.width= '100vw'
-            this.videoDom.style.height= '100vh'
-            
-            if (this.videoDom.paused) {
-            this.videoDomPlay();
-            }
-            this.videoDom.addEventListener(
-            "mousemove",
-            this.throttle(this.fullScreeAutoShowHide, 1000, timer)
-            );
-        } else {
-            this.videoDom.style.width= '100%'
-            this.videoDom.style.height= '100%'
-            document.exitFullscreen(); //要用document调用此函数
+      e.stopPropagation();
+      let timer;
+      if (!this.checkFull()) {
+        this.videoBox.requestFullscreen();
+        this.videoDom.style.width = "100vw";
+        this.videoDom.style.height = "100vh";
+
+        if (this.videoDom.paused) {
+          this.videoDomPlay();
         }
+        this.videoDom.addEventListener(
+          "mousemove",
+          this.throttle(this.fullScreeAutoShowHide, 1000, timer)
+        );
+      } else {
+        this.videoDom.style.width = "100%";
+        this.videoDom.style.height = "100%";
+        document.exitFullscreen(); //要用document调用此函数
+      }
     },
 
     videoDomPlay() {
-        if (this.videoDom.paused) {
-            this.videoDom.play();
-            this.aArray[1].classList.remove("icon-bofang");
-            this.aArray[1].classList.add("icon-zanting");
-        } else {
-            this.videoDom.pause();
-            this.aArray[1].classList.remove("icon-zanting");
-            this.aArray[1].classList.add("icon-bofang");
-        }
+      if (this.videoDom.paused) {
+        this.videoDom.play();
+        this.aArray[1].classList.remove("icon-bofang");
+        this.aArray[1].classList.add("icon-zanting");
+      } else {
+        this.videoDom.pause();
+        this.aArray[1].classList.remove("icon-zanting");
+        this.aArray[1].classList.add("icon-bofang");
+      }
     },
 
     numToMinute(num) {
@@ -206,72 +216,76 @@ export default {
       }
     },
 
-    video_pause(){
-      this.$store.state.isOpen = false
+    video_pause() {
+      this.SET_IS_OPEN(false);
       this.videoDom.pause();
-    }
+    },
+    ...mapMutations("file", ["SET_IS_OPEN"]),
   },
-  mounted(){
-    this.video_play = this.$refs.video_play
-    this.log = document.getElementById('log')
-    this.videoBox = document.getElementById('vb')
-    this.videoDom = document.querySelector("#vd")
-    this.fullScree = document.querySelector(".fullScree")
-    this.playDom = document.querySelector(".play")
-    this.controlBarDom = document.querySelector(".controlBar")
-    this.video_status = document.querySelector('.video-status')
-    this.aArray = document.querySelectorAll('.video-status i')
-    this.dianDom = document.querySelector(".video-status .controlBar .dian")
-    this.currentTimeDom = document.querySelector(".video-status .currentTime")
-    this.druationDom = document.querySelector(".video-status .druation")
+  mounted() {
+    this.video_play = this.$refs.video_play;
+    this.log = document.getElementById("log");
+    this.videoBox = document.getElementById("vb");
+    this.videoDom = document.querySelector("#vd");
+    this.fullScree = document.querySelector(".fullScree");
+    this.playDom = document.querySelector(".play");
+    this.controlBarDom = document.querySelector(".controlBar");
+    this.video_status = document.querySelector(".video-status");
+    this.aArray = document.querySelectorAll(".video-status i");
+    this.dianDom = document.querySelector(".video-status .controlBar .dian");
+    this.currentTimeDom = document.querySelector(".video-status .currentTime");
+    this.druationDom = document.querySelector(".video-status .druation");
 
-    this.fullScree.addEventListener("click", this.fullScreeVideo)
-    this.playDom.addEventListener("click", this.videoDomPlay)
-    this.videoDom.addEventListener("click", this.videoDomPlay)
-    this.videoBox.addEventListener("mouseover", ()=> {
-        this.log.style.bottom = "40px"
-    })
-    this.videoBox.addEventListener("mouseout", ()=> {
-        this.log.style.bottom = "-40px"
-    })
-    this.aArray[2].addEventListener('click', ()=> {
-        if (this.videoDom.muted) {
-            this.videoDom.muted = false; // 打开声音
-        } else {
-            this.videoDom.muted = true; // 关闭声音
-        }
-    })
-    this.controlBarDom.addEventListener("click", e=> {
-        let controlBarLength = parseInt(getComputedStyle(this.controlBarDom)["width"])
-        let currentX = e.offsetX
-        this.videoDom.currentTime = (currentX / controlBarLength) * this.videoDom.duration
-    })
-    this.videoDom.addEventListener('canplaythrough', ()=> {
-        console.log('提示:视频的元数据已加载')
-        let duration = this.videoDom.duration
-        let currentTimes = this.videoDom.currentTime
-        this.currentTimeDom.innerText = this.numToMinute(parseInt(currentTimes))
-        this.druationDom.innerText = this.numToMinute(parseInt(duration));
-    })
-    this.videoDom.addEventListener("timeupdate", ()=> {
-        let duration = this.videoDom.duration
-        let currentTimes = this.videoDom.currentTime
-        this.currentTimeDom.innerText = this.numToMinute(parseInt(currentTimes))
-        this.druationDom.innerText = this.numToMinute(parseInt(duration));
-        let dianDomWidth = Number((currentTimes / duration).toFixed(2))
-        this.dianDom.style.width = dianDomWidth * 100 + "%"
-    })
-    this.videoDom.addEventListener("ended", ()=> {
-        this.aArray[1].classList.remove("icon-zanting")
-        this.aArray[1].classList.add("icon-bofang")
-    })
+    this.fullScree.addEventListener("click", this.fullScreeVideo);
+    this.playDom.addEventListener("click", this.videoDomPlay);
+    this.videoDom.addEventListener("click", this.videoDomPlay);
+    this.videoBox.addEventListener("mouseover", () => {
+      this.log.style.bottom = "40px";
+    });
+    this.videoBox.addEventListener("mouseout", () => {
+      this.log.style.bottom = "-40px";
+    });
+    this.aArray[2].addEventListener("click", () => {
+      if (this.videoDom.muted) {
+        this.videoDom.muted = false; // 打开声音
+      } else {
+        this.videoDom.muted = true; // 关闭声音
+      }
+    });
+    this.controlBarDom.addEventListener("click", (e) => {
+      let controlBarLength = parseInt(
+        getComputedStyle(this.controlBarDom)["width"]
+      );
+      let currentX = e.offsetX;
+      this.videoDom.currentTime =
+        (currentX / controlBarLength) * this.videoDom.duration;
+    });
+    this.videoDom.addEventListener("canplaythrough", () => {
+      console.log("提示:视频的元数据已加载");
+      let duration = this.videoDom.duration;
+      let currentTimes = this.videoDom.currentTime;
+      this.currentTimeDom.innerText = this.numToMinute(parseInt(currentTimes));
+      this.druationDom.innerText = this.numToMinute(parseInt(duration));
+    });
+    this.videoDom.addEventListener("timeupdate", () => {
+      let duration = this.videoDom.duration;
+      let currentTimes = this.videoDom.currentTime;
+      this.currentTimeDom.innerText = this.numToMinute(parseInt(currentTimes));
+      this.druationDom.innerText = this.numToMinute(parseInt(duration));
+      let dianDomWidth = Number((currentTimes / duration).toFixed(2));
+      this.dianDom.style.width = dianDomWidth * 100 + "%";
+    });
+    this.videoDom.addEventListener("ended", () => {
+      this.aArray[1].classList.remove("icon-zanting");
+      this.aArray[1].classList.add("icon-bofang");
+    });
 
-    window.document.addEventListener("keydown", e=> {
-        if (e.keyCode == 32) {
-            this.videoDomPlay()
-        }
-    })
-  }
+    window.document.addEventListener("keydown", (e) => {
+      if (e.keyCode == 32) {
+        this.videoDomPlay();
+      }
+    });
+  },
 };
 </script>
 
@@ -298,21 +312,21 @@ export default {
       object-fit: contain;
     }
   }
-  .images{
-      width: 1000px;
-      height: 560px;
-      margin: 50px auto 0;
-      position: relative;
-      overflow: hidden;
-      text-align: center;
-      background-color: #000;
-      display: flex;  
-      justify-content: center;  
-      align-items: center;
-      img{
-        max-width: 100%;
-        object-fit: cover;
-      }
+  .images {
+    width: 1000px;
+    height: 560px;
+    margin: 50px auto 0;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+      max-width: 100%;
+      object-fit: cover;
+    }
   }
   .video-status {
     width: 100%;
@@ -420,5 +434,5 @@ export default {
     width: 100vw;
     height: 100vh;
   }
-  }
+}
 </style>

@@ -29,6 +29,15 @@
                   @keyup.enter.native="loginForm('ruleForm')"
                 ></el-input>
               </el-form-item>
+
+              <el-form-item>
+                <el-button
+                  type="primary"
+                  @click="loginForm('ruleForm')"
+                  style="width: 100%"
+                  >登录</el-button
+                >
+              </el-form-item>
               <el-row>
                 <el-col :span="6" :offset="16">
                   <el-link
@@ -40,14 +49,6 @@
                   >
                 </el-col>
               </el-row>
-              <el-form-item>
-                <el-button
-                  type="primary"
-                  @click="loginForm('ruleForm')"
-                  style="width: 100%"
-                  >登录</el-button
-                >
-              </el-form-item>
             </el-form>
           </el-tab-pane>
           <el-tab-pane label="注册">
@@ -187,7 +188,10 @@ export default {
             let { message, status } = res;
             console.log(status);
             if (status == 0) this.$message({ message: message, type: "error" });
-            else this.$message({ message: message, type: "success" });
+            else {
+              this.$message({ message: message, type: "success" });
+              this.$router.go(0);
+            }
           });
         }
       });

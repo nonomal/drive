@@ -19,7 +19,7 @@
             <i class="el-icon-more"></i>
           </div>
           <div class="img">
-            <FileType :data="item"></FileType>
+            <FileType :data="item" :DOMAIN="DOMAIN"></FileType>
           </div>
           <div class="title">
             <p class="name">{{ item.file_name }}</p>
@@ -163,7 +163,7 @@
     <div class="file_move" v-if="dialogMove">
       <el-dialog title="提示" :visible.sync="dialogMove" width="30%">
         <el-tree
-          :props="props"
+          :props="{ label: 'name' }"
           :load="loadNode"
           lazy
           @node-click="nodeClick"
@@ -231,9 +231,10 @@ import { mapActions, mapMutations, mapState } from "vuex";
 export default {
   data() {
     return {
-      props: { label: "name" },
       dialogMove: false,
       List: [],
+      DOMAIN: "",
+      format,
       fileList: [],
       arryCheck: [],
       menuShow: false,
@@ -257,7 +258,6 @@ export default {
       col_num: 8,
       currentFileId: null,
       mouse_Info: { clientX: null, clientY: null },
-      format,
       disabled: true,
       shareList: ["7天有效", "15天有效", "30天有效"],
       dropText: "7天有效",
@@ -459,6 +459,7 @@ export default {
         parent_file_id,
       }).then((res) => {
         this.List = res.fileList;
+        this.DOMAIN = res.DOMAIN;
         this.formatFileData(res.fileList);
       });
     },

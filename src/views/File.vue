@@ -246,8 +246,8 @@ export default {
     // 合并文件
     mergeFile(e) {
       var files = e.target.files[0];
-      var name = files.name;
-      var file_id = getMD5(name);
+      var file_name = files.name;
+      var file_id = getMD5(file_name);
       var file_size = files.size;
       var file_type = files.type;
       let time = format("YYYY-MM-DD hh:mm:ss");
@@ -256,7 +256,7 @@ export default {
       merge({
         drive_id,
         file_id,
-        name,
+        file_name,
         parent_file_id,
         file_size,
         file_type,
@@ -264,6 +264,7 @@ export default {
         updated_at: time,
       }).then(async (res) => {
         await this.getUserDrive();
+        this.$refs.folder.getUserFile();
         this.$message.success(res.message);
       });
       this.upload_Ele = false;
