@@ -5,7 +5,7 @@
       <div class="login-box">
         <div class="icon" style="margin-bottom: 10px">
           <img
-            src="../assets/1.png"
+            src="../assets/icon.png"
             height="40"
             style="vertical-align: middle"
           /><span style="font-weight: 500">小破盘</span>
@@ -74,7 +74,7 @@
           <el-row>
             <el-col :span="6" :offset="16">
               <el-link
-                href="/login"
+                @click="goBack"
                 icon="el-icon-link"
                 style="margin-top: -12px"
                 target="_blank"
@@ -174,7 +174,9 @@ export default {
         }
       });
     },
-
+    goBack() {
+      window.close();
+    },
     // username验证回调
     usernameValid(rule, value, callback) {
       let reg = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/g;

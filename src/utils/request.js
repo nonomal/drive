@@ -1,9 +1,9 @@
 import axios from 'axios'
 import app from '../main'
-axios.defaults.baseURL = 'http://localhost:3000'
-// axios.defaults.baseURL = ''
 
-let instance = axios.create()
+let instance = axios.create({
+    baseURL: process.env.VUE_APP_BASE_API
+})
 instance.interceptors.request.use(config => {
     config.headers['authorization'] = `Bearer ${localStorage.getItem('token')}`
     return config

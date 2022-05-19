@@ -5,7 +5,7 @@
       <div class="login-box">
         <div class="icon" style="margin-bottom: 10px">
           <img
-            src="../assets/1.png"
+            src="../assets/icon.png"
             height="40"
             style="vertical-align: middle"
           /><span style="font-weight: 500">小破盘</span>

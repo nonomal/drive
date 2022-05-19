@@ -43,7 +43,7 @@
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item v-for="(item, index) in routers" :key="index">
           <span class="nav_link" @click="goBack(item, index)">{{
-            item.name
+            item.file_name
           }}</span>
         </el-breadcrumb-item>
       </el-breadcrumb>

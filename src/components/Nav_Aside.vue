@@ -2,7 +2,7 @@
   <div class="Nav_meut">
     <el-col>
       <div class="icon" style="margin-bottom: 10px">
-        <img src="../assets/1.png" height="60" /><span>小破盘</span>
+        <img src="../assets/icon.png" height="60" /><span>小破盘</span>
       </div>
       <el-menu
         default-active="/drive/file"

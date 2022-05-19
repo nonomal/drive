@@ -1,4 +1,4 @@
-import { Button, Tabs, Form, Menu, Breadcrumb, Tooltip, BreadcrumbItem, MenuItem, FormItem, TabPane, Link, Input, Aside, Container, Main, Checkbox, Tree, Dialog, Card, Progress, Col, Row, Popover, Dropdown, DropdownItem, DropdownMenu, Message, Loading } from 'element-ui'
+import { Button, Tabs, Form, Menu, Breadcrumb, Tooltip, BreadcrumbItem, MenuItem, FormItem, TabPane, Link, Input, Aside, Container, Main, Checkbox, Tree, Dialog, Card, Progress, Col, Row, Popover, Dropdown, DropdownItem, DropdownMenu, Message, Loading, MessageBox } from 'element-ui'
 import Vue from 'vue'
 
 Vue.component(Button.name, Button)
@@ -30,5 +30,6 @@ Vue.component(BreadcrumbItem.name, BreadcrumbItem)
 
 Vue.use(Loading.directive);
 
+Vue.prototype.$confirm = MessageBox.confirm;
 Vue.prototype.$loading = Loading.service;
 Vue.prototype.$message = Message;

@@ -1,5 +1,5 @@
 <template>
-  <div class="video_play" v-show="isOpen" ref="video_play">
+  <div class="video_play" v-show="isOpen">
     <el-row :gutter="20">
       <el-col :span="6"
         ><i
@@ -9,32 +9,16 @@
         ></i
       ></el-col>
       <el-col :span="6" :offset="3" style="text-align: center">
-        <span class="video_name">{{ name }}</span>
+        <span class="video_name">{{ video_name }}</span>
       </el-col>
     </el-row>
     <el-row>
       <el-col>
-        <div class="view" id="vb" v-show="type.includes('video')">
-          <video
-            id="vd"
-            :src="src"
-            playsinline
-            webkit-playsinline="true"
-          ></video>
-          <div class="video-status" id="log">
-            <i class="controlBar"><span class="dian"></span></i>
-            <i class="play iconfont icon-bofang"></i>
-            <span class="currentTime"></span>&nbsp;&nbsp;/&nbsp;&nbsp;
-            <span class="druation"></span>
-            <div class="controlRight">
-              <i class="audio iconfont icon-shengyin" title="音量"></i>
-              <i class="fullScree iconfont icon-quanping1" title="全屏"></i>
-              <i class="set iconfont icon-shezhi" title="设置"></i>
-            </div>
-          </div>
+        <div class="view" id="vb" v-show="file_type.includes('video')">
+          <NPlayer ref="player" :options="options" :set="setPlayer" />
         </div>
-        <div class="images" v-show="type.includes('image')">
-          <img :src="src" />
+        <div class="images" v-if="file_type.includes('image')">
+          <img :src="video_src" />
         </div>
       </el-col>
     </el-row>
@@ -43,249 +27,44 @@
 
 <script>
 import { mapMutations, mapState } from "vuex";
+
 export default {
   data() {
     return {
-      log: null,
-      videoBox: null,
-      videoDom: null,
-      fullScree: null,
-      playDom: null,
-      controlBarDom: null,
-      aArray: null,
-      dianDom: null,
-      currentTimeDom: null,
-      druationDom: null,
-      video_play: null,
-      src: null,
-      name: null,
-      type: "",
+      file_type: "",
+      video_name: "",
+      options: {
+        src: "",
+        poster: "",
+      },
     };
   },
   computed: {
-    ...mapState("file", ["isOpen"]),
-    video_info() {
-      return this.$store.state.video_info;
-    },
+    ...mapState("file", ["isOpen", "video_info"]),
   },
   watch: {
     video_info() {
-      this.src = this.video_info.download_url;
-      this.name = this.video_info.name;
-      this.type = this.video_info.type;
-    },
-    isOpen(val) {
-      if (val) {
-        this.video_play.style.zIndex = 2;
-      } else {
-        this.video_play.style.zIndex = -1;
-      }
+      let { download_url, DOMAIN, file_name, type, cover_url } =
+        this.video_info;
+      this.options.src = DOMAIN + "/" + download_url;
+      this.video_name = file_name;
+      this.file_type = type;
+      this.options.poster = DOMAIN + "/" + cover_url;
+      console.log(3333);
+      this.$options.player.updateOptions(this.options);
     },
   },
   methods: {
-    debouce(func, delay, immediate) {
-      var timer = null;
-      return function () {
-        var context = this;
-        var args = arguments;
-        if (timer) clearTimeout(timer);
-        if (immediate) {
-          //根据距离上次触发操作的时间是否到达delay来决定是否要现在执行函数
-          var doNow = !timer;
-          //每一次都重新设置timer，就是要保证每一次执行的至少delay秒后才可以执行
-          timer = setTimeout(function () {
-            timer = null;
-          }, delay);
-          //立即执行
-          if (doNow) {
-            func.apply(context, args);
-          }
-        } else {
-          timer = setTimeout(function () {
-            func.apply(context, args);
-          }, delay);
-        }
-      };
-    },
-    throttle(func, delay, parms) {
-      var prev = Date.now();
-      return function () {
-        var context = this;
-        var now = Date.now();
-        if (now - prev >= delay) {
-          func.apply(context, Array(parms));
-          prev = Date.now();
-        }
-      };
-    },
-
-    fullScreeAutoShowHide(timer) {
-      this.log.style.bottom = "40px";
-      this.videoBox.style.cursor = "default";
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(() => {
-        this.log.style.bottom = "-40px";
-        this.videoBox.style.cursor = "none";
-      }, 3000);
-    },
-
-    fullScreeVideo(e) {
-      e.stopPropagation();
-      let timer;
-      if (!this.checkFull()) {
-        this.videoBox.requestFullscreen();
-        this.videoDom.style.width = "100vw";
-        this.videoDom.style.height = "100vh";
-
-        if (this.videoDom.paused) {
-          this.videoDomPlay();
-        }
-        this.videoDom.addEventListener(
-          "mousemove",
-          this.throttle(this.fullScreeAutoShowHide, 1000, timer)
-        );
-      } else {
-        this.videoDom.style.width = "100%";
-        this.videoDom.style.height = "100%";
-        document.exitFullscreen(); //要用document调用此函数
-      }
-    },
-
-    videoDomPlay() {
-      if (this.videoDom.paused) {
-        this.videoDom.play();
-        this.aArray[1].classList.remove("icon-bofang");
-        this.aArray[1].classList.add("icon-zanting");
-      } else {
-        this.videoDom.pause();
-        this.aArray[1].classList.remove("icon-zanting");
-        this.aArray[1].classList.add("icon-bofang");
-      }
-    },
-
-    numToMinute(num) {
-      num = Number(num);
-      let minute = parseInt(num / 60);
-      let second = parseInt(num - minute * 60);
-      if (second <= 9) {
-        second = "0" + second;
-      }
-      if (minute <= 9) {
-        minute = "0" + minute;
-      }
-      if (num > 60 * 60) {
-        let hours = parseInt((num / 60) * 60);
-        return `${hours}:${minute}:${second}`;
-      }
-      return `${minute}:${second}`;
-    },
-
-    checkFull() {
-      var isFull =
-        document.fullscreenElement ||
-        document.mozFullScreenElement ||
-        document.webkitFullscreenElement;
-      if (isFull === undefined) isFull = false;
-      return isFull;
-    },
-
-    fullScreen(element) {
-      element = document.documentElement;
-      if (element.requestFullscreen) {
-        element.requestFullscreen();
-      } else if (element.msRequestFullscreen) {
-        element.msRequestFullscreen();
-      } else if (element.mozRequestFullScreen) {
-        element.mozRequestFullScreen();
-      } else if (element.webkitRequestFullscreen) {
-        element.webkitRequestFullscreen();
-      }
-    },
-
-    exitFullscreen() {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      }
-    },
-
     video_pause() {
       this.SET_IS_OPEN(false);
-      this.videoDom.pause();
+      this.$options.player.pause();
     },
-    ...mapMutations("file", ["SET_IS_OPEN"]),
+    setPlayer(player) {
+      this.$options.player = player;
+    },
+    ...mapMutations("file", ["SET_IS_OPEN", "SET_VIDEO_INFO"]),
   },
-  mounted() {
-    this.video_play = this.$refs.video_play;
-    this.log = document.getElementById("log");
-    this.videoBox = document.getElementById("vb");
-    this.videoDom = document.querySelector("#vd");
-    this.fullScree = document.querySelector(".fullScree");
-    this.playDom = document.querySelector(".play");
-    this.controlBarDom = document.querySelector(".controlBar");
-    this.video_status = document.querySelector(".video-status");
-    this.aArray = document.querySelectorAll(".video-status i");
-    this.dianDom = document.querySelector(".video-status .controlBar .dian");
-    this.currentTimeDom = document.querySelector(".video-status .currentTime");
-    this.druationDom = document.querySelector(".video-status .druation");
-
-    this.fullScree.addEventListener("click", this.fullScreeVideo);
-    this.playDom.addEventListener("click", this.videoDomPlay);
-    this.videoDom.addEventListener("click", this.videoDomPlay);
-    this.videoBox.addEventListener("mouseover", () => {
-      this.log.style.bottom = "40px";
-    });
-    this.videoBox.addEventListener("mouseout", () => {
-      this.log.style.bottom = "-40px";
-    });
-    this.aArray[2].addEventListener("click", () => {
-      if (this.videoDom.muted) {
-        this.videoDom.muted = false; // 打开声音
-      } else {
-        this.videoDom.muted = true; // 关闭声音
-      }
-    });
-    this.controlBarDom.addEventListener("click", (e) => {
-      let controlBarLength = parseInt(
-        getComputedStyle(this.controlBarDom)["width"]
-      );
-      let currentX = e.offsetX;
-      this.videoDom.currentTime =
-        (currentX / controlBarLength) * this.videoDom.duration;
-    });
-    this.videoDom.addEventListener("canplaythrough", () => {
-      console.log("提示:视频的元数据已加载");
-      let duration = this.videoDom.duration;
-      let currentTimes = this.videoDom.currentTime;
-      this.currentTimeDom.innerText = this.numToMinute(parseInt(currentTimes));
-      this.druationDom.innerText = this.numToMinute(parseInt(duration));
-    });
-    this.videoDom.addEventListener("timeupdate", () => {
-      let duration = this.videoDom.duration;
-      let currentTimes = this.videoDom.currentTime;
-      this.currentTimeDom.innerText = this.numToMinute(parseInt(currentTimes));
-      this.druationDom.innerText = this.numToMinute(parseInt(duration));
-      let dianDomWidth = Number((currentTimes / duration).toFixed(2));
-      this.dianDom.style.width = dianDomWidth * 100 + "%";
-    });
-    this.videoDom.addEventListener("ended", () => {
-      this.aArray[1].classList.remove("icon-zanting");
-      this.aArray[1].classList.add("icon-bofang");
-    });
-
-    window.document.addEventListener("keydown", (e) => {
-      if (e.keyCode == 32) {
-        this.videoDomPlay();
-      }
-    });
-  },
+  mounted() {},
 };
 </script>
 
@@ -297,7 +76,7 @@ export default {
   bottom: 0;
   right: 0;
   padding: 20px;
-  z-index: -1;
+  z-index: 2;
   background-color: #fff;
   .view {
     width: 1000px;

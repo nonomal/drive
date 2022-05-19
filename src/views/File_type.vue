@@ -1,8 +1,8 @@
 <template>
   <div class="files">
     <div class="img" v-if="type.includes('image')">
-      <img :src="DOMAIN + data.download_url" />
-      <i class="el-icon-star-on" v-if="data.isCollection"></i>
+      <img :src="cover_url" />
+      <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="video" v-else-if="type.includes('video')">
       <span class="play">
@@ -16,24 +16,24 @@
           </use>
         </svg>
       </span>
-      <img :src="data.cover_url" />
-      <i class="el-icon-star-on" v-if="data.isCollection"></i>
+      <img :src="cover_url" />
+      <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="audio" v-else-if="type.includes('audio')">
       <img :src="require('../assets/audio.png')" />
-      <i class="el-icon-star-on" v-if="data.isCollection"></i>
+      <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="folder_img" v-else-if="type.includes('folder')">
       <img :src="require('../assets/folder.png')" />
-      <i class="el-icon-star-on" v-if="data.isCollection"></i>
+      <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="text" v-else-if="type.includes('text')">
       <img :src="require('../assets/folder.png')" />
-      <i class="el-icon-star-on" v-if="data.isCollection"></i>
+      <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="zip" v-else-if="type.includes('zip')">
       <img :src="require('../assets/zip.png')" />
-      <i class="el-icon-star-on" v-if="data.isCollection"></i>
+      <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
   </div>
 </template>
@@ -41,17 +41,20 @@
 <script>
 export default {
   props: {
-    data: {
+    item: {
       required: true,
       type: Object,
-    },
-    DOMAIN: {
-      required: true,
     },
   },
   computed: {
     type() {
-      return this.data.type;
+      return this.item.type;
+    },
+    isCollection() {
+      return this.item.isCollection;
+    },
+    cover_url() {
+      return `${this.item.DOMAIN}/${this.item.cover_url}`;
     },
   },
 };

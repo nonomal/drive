@@ -19,7 +19,7 @@
             <i class="el-icon-more"></i>
           </div>
           <div class="img">
-            <FileType :data="item" :DOMAIN="DOMAIN"></FileType>
+            <FileType :item="item" />
           </div>
           <div class="title">
             <p class="name">{{ item.file_name }}</p>
@@ -163,7 +163,7 @@
     <div class="file_move" v-if="dialogMove">
       <el-dialog title="提示" :visible.sync="dialogMove" width="30%">
         <el-tree
-          :props="{ label: 'name' }"
+          :props="{ label: 'file_name' }"
           :load="loadNode"
           lazy
           @node-click="nodeClick"
@@ -233,7 +233,6 @@ export default {
     return {
       dialogMove: false,
       List: [],
-      DOMAIN: "",
       format,
       fileList: [],
       arryCheck: [],
@@ -328,7 +327,7 @@ export default {
       let file_id = "root";
       if (node.level === 0) {
         return resolve([
-          { name: "root", parent_file_id: "root", file_id: "root" },
+          { file_name: "root", parent_file_id: "root", file_id: "root" },
         ]);
       } else if (node.level > 1) {
         file_id = node.data.file_id;
@@ -384,10 +383,13 @@ export default {
     },
 
     // 格式化文件数据
-    formatFileData(data) {
+    formatFileData(data = []) {
       let listItem = [];
       let count = null;
       let aryLength = data.length;
+      data.forEach((item) => {
+        item.DOMAIN = this.DOMAIN;
+      });
       if (aryLength % 8 == 0) {
         count = aryLength / 8;
       } else {
@@ -528,11 +530,11 @@ export default {
 
     // 点击事件
     open(item) {
-      let { type, file_id, name } = item;
+      let { type, file_id, file_name } = item;
       if (type == "folder") {
         this.getUserFile(this.userInfo.drive_id, file_id);
         this.SET_PARENT_FILE_ID(file_id);
-        this.SET_ROUTER({ name, path: file_id });
+        this.SET_ROUTER({ file_name, path: file_id });
       } else if (type.includes("video") || type.includes("image")) {
         this.SET_VIDEO_INFO(item);
         this.SET_IS_OPEN(true);
@@ -541,7 +543,7 @@ export default {
         this.audio_info = item;
       } else if (type.includes("search")) {
         this.SET_PARENT_FILE_ID(file_id);
-        this.SET_ROUTER({ name, path: file_id });
+        this.SET_ROUTER({ file_name, path: file_id });
       }
     },
 

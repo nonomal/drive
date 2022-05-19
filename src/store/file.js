@@ -3,7 +3,7 @@ const state = {
     video_info: null,
     isOpen: false,
     favorite: 'file',
-    routers: [{ name: '首页', path: 'root' }],
+    routers: [{ file_name: '首页', path: 'root' }],
 }
 const actions = {}
 const mutations = {
@@ -18,7 +18,7 @@ const mutations = {
     },
     SET_ROUTER(state, payload) {
         let temp = state.routers.pop()
-        if (!temp.name.includes('结果')) {
+        if (!temp.file_name.includes('结果')) {
             state.routers.push(temp)
             temp = null
         }
