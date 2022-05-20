@@ -1,5 +1,4 @@
 import request from '../utils/request'
-import axios from 'axios'
 
 function getFile(params) {
     return new Promise((resolve, reject) => {
@@ -144,13 +143,21 @@ function getPhoto(params) {
 
 function downloadFile(params) {
     return new Promise((resolve, reject) => {
-        axios.get(`/download?file_id=${params}`, {
+        request.get(`/download?file_id=${params}`, {
             responseType: 'blob'
         }).then(response => {
             resolve(response)
         }).catch(error => {
             reject(error)
         })
+    })
+}
+
+
+function getFileTotal(params) {
+    return new Promise((resolve, reject) => {
+        request.post('/api/file/getFileTotal', params).then(res => resolve(res))
+            .catch(err => reject(err))
     })
 }
 
@@ -164,6 +171,7 @@ export {
     getPhoto,
     getFolder,
     getSearch,
+    getFileTotal,
     uploadFiles,
     downloadFile,
     setCollection,

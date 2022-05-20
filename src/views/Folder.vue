@@ -176,43 +176,10 @@
         </span>
       </el-dialog>
     </div>
-
-    <div class="share_url">
-      <el-dialog title="文件直链接" :visible.sync="dialogShare_url" width="30%">
-        <el-dropdown @command="comm">
-          <span class="el-dropdown-link">
-            通过链接分享： {{ dropText
-            }}<i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item
-              :command="index"
-              v-for="(item, index) in shareList"
-              :key="index"
-              >{{ item }}</el-dropdown-item
-            >
-          </el-dropdown-menu>
-        </el-dropdown>
-        <el-input
-          style="margin-top: 20px"
-          placeholder=""
-          v-model="share_url"
-          :disabled="true"
-        >
-          <el-button
-            slot="append"
-            icon="el-icon-document-copy"
-            style="background-color: #409eff; color: #fff"
-            @click="copy"
-          ></el-button>
-        </el-input>
-      </el-dialog>
-    </div>
   </div>
 </template>
 
 <script>
-import { getShareUrl } from "../api/index";
 import {
   getFile,
   delFile,
@@ -258,10 +225,6 @@ export default {
       currentFileId: null,
       mouse_Info: { clientX: null, clientY: null },
       disabled: true,
-      shareList: ["7天有效", "15天有效", "30天有效"],
-      dropText: "7天有效",
-      share_url: "http://drive.xiezy.top/dsd32dnucgbwe29==1",
-      dialogShare_url: false,
       fullscreenLoading: false,
     };
   },
@@ -278,7 +241,12 @@ export default {
   },
   computed: {
     ...mapState("user", ["userInfo"]),
-    ...mapState("file", ["parent_file_id", "favorite"]),
+    ...mapState("file", [
+      "parent_file_id",
+      "favorite",
+      "currentPage",
+      "pageLimit",
+    ]),
   },
   watch: {
     searchFileItem() {
@@ -339,6 +307,8 @@ export default {
         return resolve(data.data);
       });
     },
+
+    openFullScreen1() {},
 
     // 获取tree组件点击data
     nodeClick(data) {
@@ -401,32 +371,6 @@ export default {
       this.fileList = listItem;
     },
 
-    // 加载动画
-    async openFullScreen1() {
-      let { type, file_id } = this.List[this.clickIndex];
-      if (type == "folder")
-        return this.$notify({
-          title: "警告",
-          message: "文件夹暂不支持分享",
-          type: "info",
-        });
-      this.fullscreenLoading = true;
-      let { share_url, message, status } = await getShareUrl({
-        drive_id: this.userInfo.drive_id,
-        file_id,
-        type,
-      });
-      if (status == 200) {
-        this.share_url = share_url;
-        this.$message({ type: "success", message });
-        this.dialogShare_url = true;
-      } else {
-        this.$message({ type: "error", message });
-        this.dialogShare_url = false;
-      }
-      this.fullscreenLoading = false;
-    },
-
     // 点击复制
     copy() {
       navigator.clipboard
@@ -441,13 +385,6 @@ export default {
             type: "error",
           })
         );
-      this.dialogShare_url = !this.dialogShare_url;
-    },
-
-    // 下拉框点击事件
-    comm(index) {
-      index = parseInt(index);
-      this.dropText = this.shareList[index];
     },
     // 获取用户文件
     getUserFile(
@@ -456,8 +393,8 @@ export default {
     ) {
       getFile({
         drive_id,
-        limit: 100,
-        page: 1,
+        limit: this.pageLimit,
+        page: this.currentPage,
         parent_file_id,
       }).then((res) => {
         this.List = res.fileList;
@@ -722,260 +659,263 @@ export default {
     display: inline-block;
   }
 }
-.fileItem {
-  width: 100px;
+.folder {
   padding: 10px;
-  text-align: center;
-  border-radius: 10px;
-  cursor: pointer;
-  position: relative;
-  a {
-    display: inline-block;
-    text-decoration: none;
-  }
-  &:hover {
-    background-color: #f5f5f6;
-    & > .selete,
-    .more {
+  .fileItem {
+    width: 100px;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+    cursor: pointer;
+    position: relative;
+    a {
       display: inline-block;
+      text-decoration: none;
     }
-  }
-  .img {
-    width: 100px;
-    height: 100px;
-    img {
-      width: 100%;
-      height: 100%;
-    }
-  }
-  .selete {
-    display: none;
-    position: absolute;
-    left: 1px;
-    top: 1px;
-    padding: 3px;
-    height: 15px;
-    width: 15px;
-    border-radius: 5px;
-    background-color: #fff;
-  }
-  .more {
-    padding: 3px;
-    height: 15px;
-    width: 15px;
-    display: none;
-    position: absolute;
-    right: 1px;
-    top: 1px;
-    border-radius: 5px;
-    background-color: #fff;
-    i {
-      color: #aaa;
-      line-height: 18px;
-      height: 18px;
-      display: block;
-      &:hover {
-        color: #000;
+    &:hover {
+      background-color: #f5f5f6;
+      & > .selete,
+      .more {
+        display: inline-block;
       }
     }
-  }
-  .title {
-    width: 100px;
-
-    p {
-      margin: 5px 0px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      &.name {
-        font-weight: 100;
-        font-size: 13px;
-        font-family: Arial, Helvetica, sans-serif;
-      }
-      &.time {
-        font-size: 12px;
-        color: #bbb;
-      }
-    }
-  }
-}
-.el-checkbox {
-  position: absolute;
-  left: 4px;
-  top: 0;
-  & /deep/ .el-checkbox__inner {
-    border-radius: 50%;
-  }
-}
-.fileMenuAction {
-  padding: 10px;
-  width: 100%;
-  height: 100vh;
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 3;
-  ul.fileMenu {
-    margin: 0;
-    padding: 0;
-    max-width: 150px;
-    position: absolute;
-    background-color: #fff;
-    border-radius: 2px;
-    box-shadow: 0 0 5px 5px #eee;
-    li {
-      list-style: none;
-      padding: 10px 20px;
-      border-radius: 2px;
-      font-size: 14px;
-      cursor: pointer;
-      &:hover {
-        background-color: #c5c5c5;
-      }
-    }
-  }
-}
-.audio_play {
-  height: 60px;
-  width: 220px;
-  padding: 10px 5px 5px;
-  cursor: move;
-  border-radius: 5px;
-  position: absolute;
-  box-shadow: 0px 0px 8px #aaa;
-  background-color: #fff;
-  .audio_top {
-    display: flex;
-    user-select: none;
-    .audio_img {
-      width: 50px;
-      height: 50px;
-      position: relative;
+    .img {
+      width: 100px;
+      height: 100px;
       img {
         width: 100%;
         height: 100%;
       }
-      span.icon_box {
+    }
+    .selete {
+      display: none;
+      position: absolute;
+      left: 1px;
+      top: 1px;
+      padding: 3px;
+      height: 15px;
+      width: 15px;
+      border-radius: 5px;
+      background-color: #fff;
+    }
+    .more {
+      padding: 3px;
+      height: 15px;
+      width: 15px;
+      display: none;
+      position: absolute;
+      right: 1px;
+      top: 1px;
+      border-radius: 5px;
+      background-color: #fff;
+      i {
+        color: #aaa;
+        line-height: 18px;
+        height: 18px;
+        display: block;
+        &:hover {
+          color: #000;
+        }
+      }
+    }
+    .title {
+      width: 100px;
+
+      p {
+        margin: 5px 0px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        &.name {
+          font-weight: 100;
+          font-size: 13px;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+        &.time {
+          font-size: 12px;
+          color: #bbb;
+        }
+      }
+    }
+  }
+  .el-checkbox {
+    position: absolute;
+    left: 4px;
+    top: 0;
+    & /deep/ .el-checkbox__inner {
+      border-radius: 50%;
+    }
+  }
+  .fileMenuAction {
+    padding: 10px;
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 3;
+    ul.fileMenu {
+      margin: 0;
+      padding: 0;
+      max-width: 150px;
+      position: absolute;
+      background-color: #fff;
+      border-radius: 2px;
+      box-shadow: 0 0 5px 5px #eee;
+      li {
+        list-style: none;
+        padding: 10px 20px;
+        border-radius: 2px;
+        font-size: 14px;
         cursor: pointer;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        background-color: #aaa;
-        padding: 2px;
-        border-radius: 50%;
-        width: 25px;
-        height: 25px;
-        .icon {
+        &:hover {
+          background-color: #c5c5c5;
+        }
+      }
+    }
+  }
+  .audio_play {
+    height: 60px;
+    width: 220px;
+    padding: 10px 5px 5px;
+    cursor: move;
+    border-radius: 5px;
+    position: absolute;
+    box-shadow: 0px 0px 8px #aaa;
+    background-color: #fff;
+    .audio_top {
+      display: flex;
+      user-select: none;
+      .audio_img {
+        width: 50px;
+        height: 50px;
+        position: relative;
+        img {
+          width: 100%;
+          height: 100%;
+        }
+        span.icon_box {
+          cursor: pointer;
           position: absolute;
           left: 50%;
           top: 50%;
           transform: translate(-50%, -50%);
+          background-color: #aaa;
+          padding: 2px;
+          border-radius: 50%;
+          width: 25px;
+          height: 25px;
+          .icon {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+          }
         }
-      }
-      span.play {
-        z-index: 1;
-        cursor: pointer;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        display: inline-block;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: rgba(162, 162, 166, 0.9);
-        transform: translate(-50%, -50%);
-        svg {
+        span.play {
+          z-index: 1;
+          cursor: pointer;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          display: inline-block;
           width: 30px;
           height: 30px;
-          color: #fff;
-          fill: currentColor;
-          overflow: hidden;
+          border-radius: 50%;
+          background-color: rgba(162, 162, 166, 0.9);
+          transform: translate(-50%, -50%);
+          svg {
+            width: 30px;
+            height: 30px;
+            color: #fff;
+            fill: currentColor;
+            overflow: hidden;
+          }
         }
       }
+      i {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        cursor: pointer;
+      }
+      .audio_name {
+        width: 130px;
+        padding-left: 10px;
+        font-size: 13px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      .current_time {
+        font-size: 12px;
+        position: absolute;
+        bottom: 10px;
+        right: 5px;
+      }
     }
-    i {
-      position: absolute;
-      top: 5px;
-      right: 5px;
+    .control {
+      margin-top: 5px;
+      position: relative;
       cursor: pointer;
-    }
-    .audio_name {
-      width: 130px;
-      padding-left: 10px;
-      font-size: 13px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-    .current_time {
-      font-size: 12px;
-      position: absolute;
-      bottom: 10px;
-      right: 5px;
+      .slide_rail {
+        width: 100%;
+        height: 4px;
+        background-color: #e3e7ed;
+      }
+      .slider {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        position: absolute;
+        top: -5px;
+        left: 0;
+        border: 3px solid #e3e7ed;
+        background-color: #fff;
+      }
     }
   }
-  .control {
-    margin-top: 5px;
+  .fileDetailInfo {
+    width: 300px;
     position: relative;
-    cursor: pointer;
-    .slide_rail {
-      width: 100%;
-      height: 4px;
-      background-color: #e3e7ed;
+    & /deep/ .el-dialog__title {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 210px;
+      display: inline-block;
+      overflow: hidden;
     }
-    .slider {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      position: absolute;
-      top: -5px;
-      left: 0;
-      border: 3px solid #e3e7ed;
-      background-color: #fff;
+    & /deep/ .img {
+      margin: 0 auto;
+      text-align: center;
+      width: 100px;
+      height: 100px;
     }
-  }
-}
-.fileDetailInfo {
-  width: 300px;
-  position: relative;
-  & /deep/ .el-dialog__title {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 210px;
-    display: inline-block;
-    overflow: hidden;
-  }
-  & /deep/ .img {
-    margin: 0 auto;
-    text-align: center;
-    width: 100px;
-    height: 100px;
-  }
-  ul {
-    margin: 0;
-    padding: 10px 0 0 0;
-    li {
-      list-style: none;
-      padding: 3px;
-      p {
-        margin: 5px;
-        padding: 0;
-        i {
-          margin-right: 10px;
+    ul {
+      margin: 0;
+      padding: 10px 0 0 0;
+      li {
+        list-style: none;
+        padding: 3px;
+        p {
+          margin: 5px;
+          padding: 0;
+          i {
+            margin-right: 10px;
+          }
+          span.file_size {
+            cursor: pointer;
+          }
         }
-        span.file_size {
-          cursor: pointer;
+        span {
+          padding-left: 30px;
         }
       }
-      span {
-        padding-left: 30px;
-      }
     }
   }
-}
-.file_move {
-  width: 300px;
-  position: absolute;
+  .file_move {
+    width: 300px;
+    position: absolute;
+  }
 }
 </style>

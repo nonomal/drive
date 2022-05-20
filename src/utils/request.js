@@ -22,9 +22,10 @@ instance.interceptors.response.use(response => {
     if (error.response) {
         if (error.response.status == 403) {
             app.$message.error('验证失败，请重新登录！')
-            setTimeout(() => {
-                app.$router.replace('/login')
-            }, 1000)
+            localStorage.removeItem('token')
+            // setTimeout(async () => {
+            //     await app.$router.replace('/login')
+            // }, 2000)
         } else {
             return Promise.reject(error.message)
         }

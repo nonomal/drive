@@ -51,6 +51,16 @@
     <div class="fileList">
       <Folder ref="folder" :searchFileItem="searchFileItem"></Folder>
     </div>
+    <div class="file-page">
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="fileTotal"
+        :page-size="pageLimit"
+        @prev-click="prevClick"
+        @next-click="nextClick"
+      />
+    </div>
     <transition name="slide-fade">
       <div
         class="footerMenu"
@@ -162,7 +172,6 @@ export default {
       menuShow: false,
       footerMenuShow: false,
       menuEle: null,
-      arryCheck: [],
       clickIndex: null,
       centerDialogVisible: false,
       dirParams: {
@@ -180,19 +189,19 @@ export default {
       searchFileItem: [],
     };
   },
-  watch: {
-    arryCheck: {
-      handler(a, b) {
-        console.log(a, b);
-      },
-    },
-  },
   components: {
     Folder,
   },
   computed: {
     ...mapState("user", ["userInfo"]),
-    ...mapState("file", ["routers", "parent_file_id"]),
+    ...mapState("file", [
+      "routers",
+      "parent_file_id",
+      "fileTotal",
+      "currentPage",
+      "totalPage",
+      "pageLimit",
+    ]),
   },
   methods: {
     // 上传文件
@@ -331,11 +340,20 @@ export default {
       this.REMOVE_ROUTER(index + 1);
       this.$refs.folder.getUserFile();
     },
+    prevClick(page) {
+      this.SET_CURRENT_PAGE(page);
+      this.$refs.folder.getUserFile();
+    },
+    nextClick(page) {
+      this.SET_CURRENT_PAGE(page);
+      this.$refs.folder.getUserFile();
+    },
     ...mapMutations("file", [
       "REMOVE_ROUTER",
       "SET_PARENT_FILE_ID",
       "SET_FAVORITE",
       "SET_ROUTER",
+      "SET_CURRENT_PAGE",
     ]),
     ...mapActions("user", ["getUserDrive"]),
   },
@@ -377,117 +395,29 @@ export default {
   .fileList {
     padding: 15px 0 0 0px;
     margin-left: 10px;
-    .fileItem {
-      width: 100px;
-      padding: 10px;
-      text-align: center;
-      border-radius: 10px;
-      cursor: pointer;
-      position: relative;
-      a {
-        display: inline-block;
-        text-decoration: none;
-      }
-      &:hover {
-        background-color: #f5f5f6;
-        & > .selete,
-        .more {
-          display: inline-block;
-        }
-      }
-      .img {
-        width: 100px;
-        height: 100px;
-        img {
-          width: 100%;
-          height: 100%;
-        }
-      }
-      .selete {
-        display: none;
-        position: absolute;
-        left: 1px;
-        top: 1px;
-        padding: 3px;
-        height: 15px;
-        width: 15px;
-        border-radius: 5px;
-        background-color: #fff;
-        & /deep/ .el-checkbox__label {
-          display: none;
-        }
-      }
-      .more {
-        padding: 3px;
-        height: 15px;
-        width: 15px;
-        display: none;
-        position: absolute;
-        right: 1px;
-        top: 1px;
-        border-radius: 5px;
-        background-color: #fff;
-        i {
-          color: #aaa;
-          line-height: 18px;
-          height: 18px;
-          display: block;
-          &:hover {
-            color: #000;
-          }
-        }
-      }
-      .title {
-        width: 100px;
-        p {
-          margin: 5px;
-          &.name {
-            font-weight: 100;
-            font-size: 15px;
-            font-family: Arial, Helvetica, sans-serif;
-          }
-          &.time {
-            font-size: 12px;
-            color: #bbb;
-          }
-        }
-      }
+    height: 500px;
+    overflow: hidden;
+    overflow-y: auto;
+    border-radius: 5px;
+    &::-webkit-scrollbar-button {
+      display: none;
     }
-    .el-checkbox {
-      position: absolute;
-      left: 4px;
-      top: 0;
-      & /deep/ .el-checkbox__inner {
-        border-radius: 50%;
-      }
+
+    &::-webkit-scrollbar {
+      width: 10px;
+      border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 3px;
+      background: #409eff;
     }
   }
-  .fileMenuAction {
-    padding: 10px;
-    width: 100%;
-    height: 100vh;
-    position: absolute;
-    left: 0;
-    top: 0;
-    ul.fileMenu {
-      margin: 0;
-      padding: 0;
-      max-width: 150px;
-      position: absolute;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 0 5px 5px #eee;
-      li {
-        list-style: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-size: 14px;
-        cursor: pointer;
-        &:hover {
-          background-color: #c5c5c5;
-        }
-      }
-    }
+  .file-page {
+    padding-top: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .footerMenu {
     padding: 10px;

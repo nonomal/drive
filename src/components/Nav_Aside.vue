@@ -285,6 +285,7 @@ export default {
       this.$router.replace({ path: "/login" });
     },
   },
+  mounted() {},
 };
 </script>
 

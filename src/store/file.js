@@ -1,12 +1,34 @@
+import { getFileTotal } from '../api/file'
+import app from '../main'
 const state = {
     parent_file_id: "root",
     video_info: null,
     isOpen: false,
     favorite: 'file',
+    currentPage: 1,
+    fileTotal: 0,
+    totalPage: 1,
+    pageLimit: 50,
     routers: [{ file_name: '首页', path: 'root' }],
 }
-const actions = {}
+const actions = {
+    async getFileTotle({ commit }, data) {
+        let { status, message, total } = await getFileTotal(data)
+        if (status == 200) commit('SET_FILE_TOTAL', total)
+        else app.$message.error(message)
+    }
+}
 const mutations = {
+    SET_FILE_TOTAL(state, payload) {
+        state.fileTotal = payload
+        state.totalPage = Math.ceil(payload / state.pageLimit)
+    },
+    SET_PAGE_DATA(state, payload) {
+        state.currentPage = payload
+    },
+    SET_CURRENT_PAGE(state, payload) {
+        state.currentPage = payload
+    },
     SET_PARENT_FILE_ID(state, payload) {
         state.parent_file_id = payload
     },
@@ -31,7 +53,8 @@ const mutations = {
         state.favorite = payload
     },
 }
-const getters = {}
+const getters = {
+}
 
 
 

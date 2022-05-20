@@ -1,16 +1,19 @@
 import { getUserInfo } from '../api/users'
 import { getUserUsedDrive } from '../api/file'
+import app from '../main'
 const state = {
     userInfo: {},
 }
 const actions = {
     async getUserInfo({ commit }) {
-        let data = (await getUserInfo()).userInfo[0]
-        commit('SET_USERINFO', data)
+        let { userInfo, status, message } = (await getUserInfo())
+        if (status == 200) commit('SET_USERINFO', userInfo[0])
+        else app.$message.error(message)
     },
     async getUserDrive({ commit }) {
-        let data = (await getUserUsedDrive({ drive_id: state.userInfo.drive_id })).data[0]
-        commit('SET_USERINFO_DRIVE', data)
+        let { data, status, message } = (await getUserUsedDrive({ drive_id: state.userInfo.drive_id }))
+        if (status == 200) commit('SET_USERINFO_DRIVE', data[0])
+        else app.$message.error(message)
     }
 }
 const mutations = {

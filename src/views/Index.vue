@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 import Nav from "../components/Nav_Aside.vue";
 import play from "../components/videoPlay/Play.vue";
 export default {
@@ -21,8 +21,17 @@ export default {
     Nav,
     play,
   },
+  computed: {
+    ...mapState("user", ["userInfo"]),
+  },
   methods: {
     ...mapActions("user", ["getUserInfo"]),
+    ...mapActions("file", ["getFileTotle"]),
+  },
+  watch: {
+    userInfo() {
+      this.getFileTotle({ drive_id: this.userInfo.drive_id });
+    },
   },
   mounted() {
     this.getUserInfo();

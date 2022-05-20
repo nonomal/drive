@@ -1,8 +1,9 @@
-import { Button, Tabs, Form, Menu, Breadcrumb, Tooltip, BreadcrumbItem, MenuItem, FormItem, TabPane, Link, Input, Aside, Container, Main, Checkbox, Tree, Dialog, Card, Progress, Col, Row, Popover, Dropdown, DropdownItem, DropdownMenu, Message, Loading, MessageBox } from 'element-ui'
+import { Button, Tabs, Pagination, Form, Menu, Breadcrumb, Tooltip, BreadcrumbItem, MenuItem, FormItem, TabPane, Link, Input, Aside, Container, Main, Checkbox, Tree, Dialog, Card, Progress, Col, Row, Popover, Dropdown, DropdownItem, DropdownMenu, Message, Loading, MessageBox } from 'element-ui'
 import Vue from 'vue'
 
 Vue.component(Button.name, Button)
 Vue.component(Tabs.name, Tabs)
+Vue.component(Pagination.name, Pagination)
 Vue.component(Dialog.name, Dialog)
 Vue.component(Card.name, Card)
 Vue.component(Progress.name, Progress)

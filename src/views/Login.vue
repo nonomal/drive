@@ -113,6 +113,10 @@
         </el-tabs>
       </div>
     </div>
+    <p class="icp">
+      ©{{ fullYear }} 小破盘 版权所有
+      <a href="//beian.miit.gov.cn">豫ICP备20017833号</a>
+    </p>
   </div>
 </template>
 
@@ -149,7 +153,7 @@ export default {
         ],
         nickname: [
           { required: true, message: "昵称是必须的", trigger: "blur" },
-          { min: 5, max: 10, message: "昵称再长些呢！", trigger: "blur" },
+          { min: 3, max: 10, message: "昵称再长些呢！", trigger: "blur" },
         ],
         yanzhengma: [
           { required: true, message: "验证码是必须的", trigger: "blur" },
@@ -158,6 +162,11 @@ export default {
       },
       isLoading: false,
     };
+  },
+  computed: {
+    fullYear() {
+      return new Date().getFullYear();
+    },
   },
   methods: {
     // 发送验证码
@@ -210,6 +219,7 @@ export default {
             if (status == 200) {
               this.$message({ message, type: "success" });
               localStorage.setItem("token", token);
+
               setTimeout(() => {
                 this.$router.push("/drive/file");
               }, 1500);
@@ -263,6 +273,18 @@ export default {
     right: 200px;
     .el-tabs--border-card {
       background-color: #fff;
+    }
+  }
+  .icp {
+    font-size: 14px;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    color: #8f9bb2;
+    transform: translateX(-50%);
+    a {
+      text-decoration: none;
+      color: #8f9bb2;
     }
   }
 }

@@ -30,7 +30,7 @@ video
 
 由于这个video/controls是我学js时写的，有点low，后期打算换个好用的video播放库
 
-用户中心
+用户信息
 
 ![image-20220419093936891](images/image-20220419093936891.png)
 

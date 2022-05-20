@@ -63,11 +63,17 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.path == '/login') {
-    if (localStorage.getItem('token')) next('/drive/file')
+    if (localStorage.getItem('token')) {
+      next('/drive/file')
+    }
     else next()
-  } else {
-    next()
   }
+  if (to.path.includes('/drive')) {
+    if (localStorage.getItem('token')) {
+      next()
+    } else next('/login')
+  }
+  next()
 })
 
 export default router

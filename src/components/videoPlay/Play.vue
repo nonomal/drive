@@ -50,7 +50,6 @@ export default {
       this.video_name = file_name;
       this.file_type = type;
       this.options.poster = DOMAIN + "/" + cover_url;
-      console.log(3333);
       this.$options.player.updateOptions(this.options);
     },
   },
