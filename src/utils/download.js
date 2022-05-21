@@ -1,10 +1,8 @@
-function download_file(file,name){
-    let blob = new Blob([file])
-    let fileName = name
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a') 
-    link.href = url
+function download_file(download_url, fileName) {
+    const link = document.createElement('a')
+    link.href = download_url
     link.download = fileName
     link.click()
+    link.remove()
 }
 module.exports = download_file

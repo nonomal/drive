@@ -43,7 +43,7 @@ const routes = [
         name: 'Album',
         component: () => import('../views/Album.vue')
       }, {
-        path: 'Favorite',
+        path: 'favorite',
         name: 'Favorite',
         component: () => import('../views/Favorite.vue')
       }

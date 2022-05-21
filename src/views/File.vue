@@ -2,6 +2,10 @@
   <div class="File">
     <el-row :gutter="20" style="margin: 20px 0 20px">
       <el-col :span="12">
+        <div
+          :class="styleClass + ' icon-btn'"
+          @click="SET_ISCOLLAPSE(!isCollapse)"
+        ></div>
         <input
           type="file"
           ref="fileEle"
@@ -202,6 +206,7 @@ export default {
       "totalPage",
       "pageLimit",
     ]),
+    ...mapState("sideBar", ["isCollapse", "styleClass"]),
   },
   methods: {
     // 上传文件
@@ -355,6 +360,7 @@ export default {
       "SET_ROUTER",
       "SET_CURRENT_PAGE",
     ]),
+    ...mapMutations("sideBar", ["SET_ISCOLLAPSE"]),
     ...mapActions("user", ["getUserDrive"]),
   },
   created() {
@@ -391,6 +397,15 @@ export default {
   }
   .breadcrumb /deep/ .nav_link {
     cursor: pointer;
+  }
+  div.icon-btn {
+    font-size: 25px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    margin-right: 10px;
+    cursor: pointer;
+    vertical-align: middle;
   }
   .fileList {
     padding: 15px 0 0 0px;

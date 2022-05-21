@@ -141,15 +141,14 @@ function getPhoto(params) {
     })
 }
 
-function downloadFile(params) {
+function downloadFile(file_id, drive_id) {
     return new Promise((resolve, reject) => {
-        request.get(`/download?file_id=${params}`, {
-            responseType: 'blob'
-        }).then(response => {
-            resolve(response)
-        }).catch(error => {
-            reject(error)
-        })
+        request.get(`/api/file/getFileDownloadUrl?file_id=${file_id}&drive_id=${drive_id}`)
+            .then(response => {
+                resolve(response)
+            }).catch(error => {
+                reject(error)
+            })
     })
 }
 

@@ -18,7 +18,7 @@
           <NPlayer ref="player" :options="options" :set="setPlayer" />
         </div>
         <div class="images" v-if="file_type.includes('image')">
-          <img :src="video_src" />
+          <img :src="image_src" />
         </div>
       </el-col>
     </el-row>
@@ -33,6 +33,7 @@ export default {
     return {
       file_type: "",
       video_name: "",
+      image_src: "",
       options: {
         src: "",
         poster: "",
@@ -47,6 +48,7 @@ export default {
       let { download_url, DOMAIN, file_name, type, cover_url } =
         this.video_info;
       this.options.src = DOMAIN + "/" + download_url;
+      this.image_src = DOMAIN + "/" + download_url;
       this.video_name = file_name;
       this.file_type = type;
       this.options.poster = DOMAIN + "/" + cover_url;

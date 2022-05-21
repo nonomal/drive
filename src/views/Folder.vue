@@ -37,17 +37,11 @@
       >
         <ul class="fileMenu" ref="fileMenu">
           <li @click="download_url" v-if="!isFolder">下载</li>
-          <li
-            @click="openFullScreen1"
-            v-loading.fullscreen.lock="fullscreenLoading"
-          >
-            分享
-          </li>
           <li @click="collection">{{ collectionText }}</li>
           <li @click="modify_name">重命名</li>
           <li @click="dialogMove = true">移动</li>
           <li @click="detailInfo">查看详细信息</li>
-          <li @click="delFile" style="color: red">移到回收站</li>
+          <li @click="delFile" style="color: red">删除文件</li>
         </ul>
       </div>
     </transition>
@@ -66,7 +60,7 @@
       <div class="audio_play" v-show="audio_play" ref="audio_playEle" v-drag>
         <div class="audio_top">
           <div class="audio_img">
-            <img :src="audio_info.cover_url" alt="" />
+            <img :src="audio_info.DOMAIN + '/' + audio_info.cover_url" alt="" />
             <span class="icon_box" @click="play" v-if="audioPaused">
               <svg
                 t="1629460803482"
@@ -104,7 +98,7 @@
           <div class="current_time">{{ currentTimes }} / {{ duration }}</div>
         </div>
         <audio
-          :src="audio_info.download_url"
+          :src="audio_info.DOMAIN + '/' + audio_info.download_url"
           hidden
           ref="audio"
           @timeupdate="update_time"
@@ -125,7 +119,7 @@
           :before-close="detail_info_close"
         >
           <div class="img">
-            <FileType :data="fileInfo"></FileType>
+            <FileType :item="fileInfo"></FileType>
           </div>
           <div class="detailText">
             <div class="h5">详细信息</div>
@@ -487,19 +481,20 @@ export default {
     // 下载
     download_url() {
       let { file_id, file_name } = this.List[this.clickIndex];
-      downloadFile(file_id)
+      downloadFile(file_id, this.userInfo.drive_id)
         .then((res) => {
-          download_file(res.data, file_name);
+          let { status, message, download_url } = res;
+          if (status == 200) download_file(download_url, file_name);
+          else this.$message.error(message);
         })
-        .catch((err) => {
-          console.log("error", err);
-        });
+        .catch(() => {});
     },
 
     // 重命名
     modify_name() {
       this.dialogRename = true;
-      this.reName = this.List[this.clickIndex].file_name;
+      let filename = this.List[this.clickIndex].file_name;
+      this.reName = filename.slice(0, filename.lastIndexOf("."));
     },
 
     // 重命名

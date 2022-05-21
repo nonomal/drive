@@ -1,8 +1,8 @@
 <template>
   <el-container>
     <play />
-    <el-aside style="width: 250px">
-      <Nav />
+    <el-aside width="auto" class="el-aside">
+      <side-bar></side-bar>
     </el-aside>
     <el-container>
       <el-main>
@@ -14,12 +14,12 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
-import Nav from "../components/Nav_Aside.vue";
+import SideBar from "../components/SideBar/sidebar.vue";
 import play from "../components/videoPlay/Play.vue";
 export default {
   components: {
-    Nav,
     play,
+    SideBar,
   },
   computed: {
     ...mapState("user", ["userInfo"]),
@@ -40,4 +40,8 @@ export default {
 </script>
 
 <style>
+.el-aside {
+  position: relative;
+  overflow: hidden;
+}
 </style>
