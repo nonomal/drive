@@ -1,33 +1,40 @@
 <template>
   <div class="folder">
-    <el-row :gutter="20" v-for="(ele, key) in fileList" :key="key">
-      <el-col :span="3" v-for="(item, index) in ele" :key="index">
-        <div
-          class="fileItem"
-          ref="fileItem"
-          @contextmenu="handelMenu(index, key, $event)"
-          @click="open(item, $event)"
-        >
-          <div class="selete" @click.stop="add_seleted(item, index, key)">
-            <el-checkbox
-              v-model="arryCheck"
-              :value="index"
-              @change="handel"
-            ></el-checkbox>
+    <div class="boundary" v-if="fileList.length">
+      <el-row :gutter="20" v-for="(ele, key) in fileList" :key="key">
+        <el-col :span="3" v-for="(item, index) in ele" :key="index">
+          <div
+            class="fileItem"
+            ref="fileItem"
+            @contextmenu="handelMenu(index, key, $event)"
+            @click="open(item, $event)"
+          >
+            <div class="selete" @click.stop="add_seleted(item, index, key)">
+              <el-checkbox
+                v-model="arryCheck"
+                :value="index"
+                @change="handel"
+              ></el-checkbox>
+            </div>
+            <div class="more" @click.stop="handelMenu(index, key, $event)">
+              <i class="el-icon-more"></i>
+            </div>
+            <div class="img">
+              <FileType :item="item" />
+            </div>
+            <div class="title">
+              <p class="name">{{ item.file_name }}</p>
+              <p class="time">{{ format("MM/DD hh:mm", item.updated_at) }}</p>
+            </div>
           </div>
-          <div class="more" @click.stop="handelMenu(index, key, $event)">
-            <i class="el-icon-more"></i>
-          </div>
-          <div class="img">
-            <FileType :item="item" />
-          </div>
-          <div class="title">
-            <p class="name">{{ item.file_name }}</p>
-            <p class="time">{{ format("MM/DD hh:mm", item.updated_at) }}</p>
-          </div>
-        </div>
-      </el-col>
-    </el-row>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="empty" v-else>
+      <el-empty>
+        <el-button type="primary">上传文件</el-button>
+      </el-empty>
+    </div>
 
     <transition name="slide-fade">
       <div
@@ -216,6 +223,7 @@ export default {
       dialogFileInfo: false,
       fileInfo: {},
       col_num: 8,
+      DOMAIN: "",
       currentFileId: null,
       mouse_Info: { clientX: null, clientY: null },
       disabled: true,
@@ -409,6 +417,7 @@ export default {
     getPhotos() {
       getPhoto({ drive_id: this.userInfo.drive_id }).then((res) => {
         this.List = res.data;
+        this.DOMAIN = res.DOMAIN;
         this.formatFileData(res.data);
       });
     },

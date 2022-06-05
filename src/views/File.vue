@@ -392,6 +392,7 @@ export default {
 }
 
 .File {
+  height: calc(100vh - 60px);
   .breadcrumb {
     margin: 15px 15px;
   }

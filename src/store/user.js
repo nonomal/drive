@@ -6,14 +6,24 @@ const state = {
 }
 const actions = {
     async getUserInfo({ commit }) {
-        let { userInfo, status, message } = (await getUserInfo())
-        if (status == 200) commit('SET_USERINFO', userInfo[0])
-        else app.$message.error(message)
+        try {
+            let { userInfo, status, message } = (await getUserInfo())
+            if (status == 200) commit('SET_USERINFO', userInfo[0])
+            else app.$message.error(message)
+        } catch (error) {
+            console.debug(error)
+        }
+
     },
     async getUserDrive({ commit }) {
-        let { data, status, message } = (await getUserUsedDrive({ drive_id: state.userInfo.drive_id }))
-        if (status == 200) commit('SET_USERINFO_DRIVE', data[0])
-        else app.$message.error(message)
+        try {
+            let { data, status, message } = (await getUserUsedDrive({ drive_id: state.userInfo.drive_id }))
+            if (status == 200) commit('SET_USERINFO_DRIVE', data[0])
+            else app.$message.error(message)
+        } catch (error) {
+            console.error(error)
+        }
+
     }
 }
 const mutations = {

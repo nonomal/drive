@@ -195,8 +195,8 @@ export default {
             yanzhengma,
           }).then((res) => {
             let { message, status } = res;
-            console.log(status);
-            if (status == 0) this.$message({ message: message, type: "error" });
+            if (status == -1)
+              this.$message({ message: message, type: "error" });
             else {
               this.$message({ message: message, type: "success" });
               this.$router.go(0);
@@ -225,6 +225,8 @@ export default {
               }, 1500);
             } else {
               this.$message({ message, type: "error" });
+              this.login.password = "";
+              this.login.username = "";
             }
           } catch (error) {
             console.log(error);

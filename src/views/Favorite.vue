@@ -24,4 +24,7 @@ export default {
 </script>
 
 <style>
+.favorite {
+  height: calc(100vh - 40px);
+}
 </style>

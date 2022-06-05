@@ -43,7 +43,6 @@ const actions = {}
 const mutations = {
     SET_ISCOLLAPSE(state, payload) {
         state.isCollapse = payload
-        console.log(payload);
         if (payload) state.styleClass = "el-icon-s-unfold"
         else state.styleClass = "el-icon-s-fold"
     },

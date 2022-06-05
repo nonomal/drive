@@ -13,7 +13,7 @@ export default {
         conPass: null,
         oldPass: null,
       },
-      nickname: null,
+      nickname: "",
       customColor: "",
     };
   },
@@ -85,10 +85,14 @@ export default {
     modify_nick() {
       this.nickNameDialog = !this.nickNameDialog;
       this.nickname = this.userInfo.nickname;
+      setTimeout(() => {
+        this.$refs.nickname.focus();
+      });
     },
 
     // 修改用户昵称
     updateNick() {
+      if (!this.nickname || this.nickname.trim().length <= 1) return;
       modifyNick({
         drive_id: this.userInfo.drive_id,
         nickname: this.nickname,
@@ -142,12 +146,6 @@ export default {
       localStorage.removeItem("token");
       this.$router.replace({ path: "/login" });
     },
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath);
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath);
-    },
   },
 };
 </script>
@@ -163,8 +161,6 @@ export default {
       default-active="/drive/file"
       class="el-menu-vertical-demo"
       active-text-color="#409EFF"
-      @open="handleOpen"
-      @close="handleClose"
       :collapse="isCollapse"
     >
       <el-menu-item
@@ -227,7 +223,11 @@ export default {
         width="30%"
         center
       >
-        <el-input v-model="nickname" placeholder="请输入新的昵称"></el-input>
+        <el-input
+          v-model="nickname"
+          placeholder="请输入新的昵称"
+          ref="nickname"
+        ></el-input>
         <span slot="footer" class="dialog-footer">
           <el-button @click="nickNameDialog = false">取 消</el-button>
           <el-button type="primary" @click="updateNick">确 定</el-button>

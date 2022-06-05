@@ -13,9 +13,14 @@ const state = {
 }
 const actions = {
     async getFileTotle({ commit }, data) {
-        let { status, message, total } = await getFileTotal(data)
-        if (status == 200) commit('SET_FILE_TOTAL', total)
-        else app.$message.error(message)
+        try {
+            let { status, message, total } = await getFileTotal(data)
+            if (status == 200) commit('SET_FILE_TOTAL', total)
+            else app.$message.error(message)
+        } catch (error) {
+            console.debug(error);
+        }
+
     }
 }
 const mutations = {

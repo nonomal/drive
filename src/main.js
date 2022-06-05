@@ -3,9 +3,12 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import NPlayer from "@nplayer/vue";
+
 import './elementUse'
 
 Vue.use(NPlayer)
+
+
 Vue.config.productionTip = false
 
 let app = new Vue({

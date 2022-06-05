@@ -1,8 +1,10 @@
 <template>
   <div class="LoginLeftArea">
     <img id="canvasImg" src="https://api.dujin.org/bing/1920.php" alt="" />
-    <!-- <div v-text="text" class="text"></div> -->
-    <div class="text" v-text="text"></div>
+    <div class="text">
+      {{ text }}
+    </div>
+    <div class="author">-----{{ author }}</div>
   </div>
 </template>
 <script>
@@ -12,13 +14,15 @@ export default {
     return {
       color: "",
       text: "",
+      author: "",
     };
   },
   methods: {
     async init() {
       getYiYan()
-        .then((data) => {
-          this.text = data.newslist[0].content;
+        .then((res) => {
+          this.text = res.data.content;
+          this.author = res.data.author;
         })
         .catch((err) => console.log(err));
     },
@@ -39,15 +43,15 @@ export default {
 }
 .text {
   width: 600px;
-  height: 40px;
   text-align: center;
   margin-top: 4px;
   font-size: 14px;
   overflow: hidden;
-  display: -webkit-box;
   white-space: normal;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  overflow: hidden;
   text-overflow: ellipsis;
+}
+.author {
+  text-align: right;
 }
 </style>

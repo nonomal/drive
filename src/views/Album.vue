@@ -4,6 +4,7 @@
   </div>
 </template>
 
+
 <script>
 import { mapMutations } from "vuex";
 import Folder from "./Folder.vue";
@@ -21,4 +22,7 @@ export default {
 </script>
 
 <style>
+.album {
+  height: calc(100vh - 40px);
+}
 </style>
