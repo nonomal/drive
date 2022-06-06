@@ -32,7 +32,15 @@
     </div>
     <div class="empty" v-else>
       <el-empty>
-        <el-button type="primary">上传文件</el-button>
+        <input
+          type="file"
+          ref="fileEle"
+          @change="upload"
+          style="display: none"
+        />
+        <el-button type="primary" @click="$refs.fileEle.click()"
+          >上传文件</el-button
+        >
       </el-empty>
     </div>
 
@@ -67,7 +75,10 @@
       <div class="audio_play" v-show="audio_play" ref="audio_playEle" v-drag>
         <div class="audio_top">
           <div class="audio_img">
-            <img :src="audio_info.DOMAIN + '/' + audio_info.cover_url" alt="" />
+            <img
+              v-lazy="audio_info.DOMAIN + '/' + audio_info.cover_url"
+              alt=""
+            />
             <span class="icon_box" @click="play" v-if="audioPaused">
               <svg
                 t="1629460803482"
@@ -195,6 +206,7 @@ import {
 import download_file from "../utils/download";
 import { format } from "../utils/data";
 import FileType from "./File_type.vue";
+import uploadFileMixin from "./mixins/file";
 import { mapActions, mapMutations, mapState } from "vuex";
 export default {
   data() {
@@ -230,6 +242,7 @@ export default {
       fullscreenLoading: false,
     };
   },
+  mixins: [uploadFileMixin],
   filters: {
     KbToMb(val) {
       return parseInt((val / 1024 / 1024) * 100) / 100;
@@ -290,6 +303,7 @@ export default {
       "SET_PARENT_FILE_ID",
       "SET_IS_OPEN",
       "SET_ROUTER",
+      "SET_FILE_TOTAL",
     ]),
     ...mapActions("user", ["getUserDrive"]),
     // tree组件加载事件
@@ -401,6 +415,7 @@ export default {
       }).then((res) => {
         this.List = res.fileList;
         this.DOMAIN = res.DOMAIN;
+        this.SET_FILE_TOTAL(res.fileList && res.fileList.length);
         this.formatFileData(res.fileList);
       });
     },

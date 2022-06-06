@@ -10,9 +10,8 @@ const actions = {
             let { userInfo, status, message } = (await getUserInfo())
             if (status == 200) commit('SET_USERINFO', userInfo[0])
             else app.$message.error(message)
-        } catch (error) {
-            console.debug(error)
-        }
+            // eslint-disable-next-line no-empty
+        } catch (error) { }
 
     },
     async getUserDrive({ commit }) {

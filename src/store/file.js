@@ -17,9 +17,8 @@ const actions = {
             let { status, message, total } = await getFileTotal(data)
             if (status == 200) commit('SET_FILE_TOTAL', total)
             else app.$message.error(message)
-        } catch (error) {
-            console.debug(error);
-        }
+            // eslint-disable-next-line no-empty
+        } catch (error) { }
 
     }
 }

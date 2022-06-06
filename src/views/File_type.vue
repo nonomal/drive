@@ -1,7 +1,7 @@
 <template>
   <div class="files">
     <div class="img" v-if="type.includes('image')">
-      <img :src="cover_url" />
+      <img v-lazy="cover_url" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="video" v-else-if="type.includes('video')">
@@ -16,23 +16,23 @@
           </use>
         </svg>
       </span>
-      <img :src="cover_url" />
+      <img v-lazy="cover_url" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="audio" v-else-if="type.includes('audio')">
-      <img :src="require('../assets/audio.png')" />
+      <img v-lazy="require('../assets/audio.png')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="folder_img" v-else-if="type.includes('folder')">
-      <img :src="require('../assets/folder.png')" />
+      <img v-lazy="require('../assets/folder.png')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="text" v-else-if="type.includes('text')">
-      <img :src="require('../assets/folder.png')" />
+      <img v-lazy="require('../assets/folder.png')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="zip" v-else-if="type.includes('zip')">
-      <img :src="require('../assets/zip.png')" />
+      <img v-lazy="require('../assets/zip.png')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
   </div>

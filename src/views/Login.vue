@@ -7,7 +7,7 @@
           <img
             src="../assets/icon.png"
             height="40"
-            style="vertical-align: middle"
+            style="vertical-al ign: middle"
           /><span style="font-weight: 500">小破盘</span>
         </div>
         <el-tabs type="border-card" :stretch="true">
@@ -18,7 +18,23 @@
                   v-model="login.username"
                   autocomplete="off"
                   placeholder="请输入邮箱"
-                ></el-input>
+                >
+                  <template slot="append">
+                    <el-select
+                      v-model="login.emailSelect"
+                      slot="prepend"
+                      style="width: 130px"
+                      placeholder="请选择"
+                    >
+                      <el-option
+                        v-for="item in emailArr"
+                        :key="item.id"
+                        :label="item.email"
+                        :value="item.email"
+                      ></el-option>
+                    </el-select>
+                  </template>
+                </el-input>
               </el-form-item>
               <el-form-item prop="password">
                 <el-input
@@ -54,13 +70,34 @@
           <el-tab-pane label="注册">
             <el-form :model="register" :rules="rules" ref="register">
               <el-form-item prop="username">
-                <el-input
+                <!-- <el-input
                   type="text"
                   v-model="register.username"
                   autocomplete="off"
                   placeholder="请输入邮箱"
                   clearable
-                ></el-input>
+                ></el-input> -->
+                <el-input
+                  v-model="register.username"
+                  autocomplete="off"
+                  placeholder="请输入邮箱"
+                >
+                  <template slot="append">
+                    <el-select
+                      v-model="register.emailSelect"
+                      slot="prepend"
+                      style="width: 130px"
+                      placeholder="请选择"
+                    >
+                      <el-option
+                        v-for="item in emailArr"
+                        :key="item.id"
+                        :label="item.email"
+                        :value="item.email"
+                      ></el-option>
+                    </el-select>
+                  </template>
+                </el-input>
               </el-form-item>
               <el-form-item prop="password">
                 <el-input
@@ -91,14 +128,14 @@
                   ></el-input>
                   <el-button
                     type="primary"
-                    :disabled="isLoading"
+                    :disabled="isClick"
                     @click="sendAnPwd()"
-                    style="font-size: 13px"
+                    style="font-size: 13px; min-width: 107px"
                     v-loading="isLoading"
                     element-loading-spinner="el-icon-loading"
                     element-loading-background="rgba(255, 255, 255, 0.5)"
                     class="btn"
-                    >获取验证码</el-button
+                    >{{ tipText }}</el-button
                   >
                 </el-form-item>
               </el-col>
@@ -130,17 +167,26 @@ export default {
       login: {
         password: "",
         username: "",
+        emailSelect: "@qq.com",
       },
+      emailArr: [
+        { email: "@qq.com", id: "001" },
+        { email: "@gmail.com", id: "002" },
+        { email: "@136.com", id: "003" },
+        { email: "@139.com", id: "004" },
+        { email: "@yahoo.com", id: "005" },
+        { email: "@msn.com", id: "006" },
+      ],
       register: {
         password: "",
         username: "",
         nicheng: "",
         yanzhengma: "",
+        emailSelect: "@qq.com",
       },
       rules: {
         username: [
           { required: true, message: "邮箱是必须的", trigger: "blur" },
-          { validator: this.usernameValid, trigger: "blur" },
         ],
         password: [
           { required: true, message: "密码是必须的", trigger: "blur" },
@@ -160,7 +206,9 @@ export default {
           { type: "number", message: "必须为数字值" },
         ],
       },
+      tipText: "获取验证码",
       isLoading: false,
+      isClick: false,
     };
   },
   computed: {
@@ -172,11 +220,14 @@ export default {
     // 发送验证码
     sendAnPwd() {
       let reg = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/g;
-      if (reg.test(this.register.username)) {
+      let { username, emailSelect } = this.register;
+      if (reg.test(username + emailSelect)) {
         this.isLoading = true;
+        this.isClick = true;
         sendPwd({ username: this.register.username }).then((res) => {
           this.$message({ message: res.message, type: "success" });
           this.isLoading = false;
+          this.setTipText();
         });
       } else {
         this.$message.error("邮箱格式不正确");
@@ -185,11 +236,12 @@ export default {
 
     // 注册账户
     submitForm(formName) {
-      let { username, password, nickname, yanzhengma } = this.register;
+      let { username, password, nickname, yanzhengma, emailSelect } =
+        this.register;
       this.$refs[formName].validate((valid) => {
         if (valid) {
           Register({
-            username,
+            username: username + emailSelect,
             password: getPassMD5(password),
             nickname,
             yanzhengma,
@@ -208,13 +260,13 @@ export default {
 
     // 登录
     loginForm(formName) {
-      let { password, username } = this.login;
+      let { password, username, emailSelect } = this.login;
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
           try {
             let { status, message, token } = await Login({
               password: getPassMD5(password),
-              username,
+              username: username + emailSelect,
             });
             if (status == 200) {
               this.$message({ message, type: "success" });
@@ -235,13 +287,16 @@ export default {
       });
     },
 
-    // username验证回调
-    usernameValid(rule, value, callback) {
-      let reg = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/g;
-      if (!reg.test(value)) {
-        callback(new Error("邮箱格式不正确！"));
-      }
-      callback();
+    setTipText() {
+      let second = 60;
+      let timer = setInterval(() => {
+        this.tipText = second;
+        second -= 1;
+        if (second < 0) {
+          clearInterval(timer);
+          this.isClick = false;
+        }
+      }, 1000);
     },
   },
   components: {

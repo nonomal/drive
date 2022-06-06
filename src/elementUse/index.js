@@ -1,4 +1,4 @@
-import { Empty, Button, Tabs, Pagination, MenuItemGroup, Submenu, Form, Menu, Breadcrumb, Tooltip, BreadcrumbItem, MenuItem, FormItem, TabPane, Link, Input, Aside, Container, Main, Checkbox, Tree, Dialog, Card, Progress, Col, Row, Popover, Dropdown, DropdownItem, DropdownMenu, Message, Loading, MessageBox } from 'element-ui'
+import { Empty, Button, Select, Option, Tabs, Pagination, MenuItemGroup, Submenu, Form, Menu, Breadcrumb, Tooltip, BreadcrumbItem, MenuItem, FormItem, TabPane, Link, Input, Aside, Container, Main, Checkbox, Tree, Dialog, Card, Progress, Col, Row, Popover, Dropdown, DropdownItem, DropdownMenu, Message, Loading, MessageBox } from 'element-ui'
 import Vue from 'vue'
 
 Vue.component(Button.name, Button)
@@ -11,7 +11,7 @@ Vue.component(Col.name, Col)
 Vue.component(Row.name, Row)
 Vue.component(Empty.name, Empty)
 Vue.component(MenuItemGroup.name, MenuItemGroup)
-
+Vue.component(Select.name, Select)
 Vue.component(Submenu.name, Submenu)
 Vue.component(Input.name, Input)
 Vue.component(Tree.name, Tree)
@@ -23,6 +23,7 @@ Vue.component(TabPane.name, TabPane)
 Vue.component(Form.name, Form)
 Vue.component(Link.name, Link)
 Vue.component(Menu.name, Menu)
+Vue.component(Option.name, Option)
 Vue.component(MenuItem.name, MenuItem)
 Vue.component(FormItem.name, FormItem)
 Vue.component(Popover.name, Popover)
