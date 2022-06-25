@@ -8,6 +8,11 @@
 
 [在线预览](http://drive.xiezy.top)
 
+***预览账号***
+>   账号：test@gmail.com
+>
+>  密码：test12345678
+>
 首页
 
 ![](images/image-20220419093325699.png)
