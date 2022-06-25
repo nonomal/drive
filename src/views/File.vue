@@ -61,6 +61,7 @@
         layout="prev, pager, next"
         :total="fileTotal"
         :page-size="pageLimit"
+        :current-page="currentPage"
         @prev-click="prevClick"
         @next-click="nextClick"
       />
@@ -270,6 +271,7 @@ export default {
       this.SET_CURRENT_PAGE(page);
       this.$refs.folder.getUserFile();
     },
+
     ...mapMutations("file", [
       "REMOVE_ROUTER",
       "SET_PARENT_FILE_ID",
@@ -284,6 +286,13 @@ export default {
   },
   mounted() {
     this.menuEle = this.$refs.fileMenu;
+    // this.$alert(
+    //   "<p>感谢诸位的支持与理解，祝大家生活愉快。</p><br/><p>感谢诸位的支持与理解，祝大家生活愉快。</p>",
+    //   "消息提醒",
+    //   {
+    //     dangerouslyUseHTMLString: true,
+    //   }
+    // );
   },
 };
 </script>

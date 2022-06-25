@@ -52,6 +52,7 @@
       >
         <ul class="fileMenu" ref="fileMenu">
           <li @click="download_url" v-if="!isFolder">下载</li>
+          <li @click="getDownload_url" v-if="!isFolder">获取文件直链</li>
           <li @click="collection">{{ collectionText }}</li>
           <li @click="modify_name">重命名</li>
           <li @click="dialogMove = true">移动</li>
@@ -208,6 +209,7 @@ import { format } from "../utils/data";
 import FileType from "./File_type.vue";
 import uploadFileMixin from "./mixins/file";
 import { mapActions, mapMutations, mapState } from "vuex";
+import { copy } from "../utils/clipboard";
 export default {
   data() {
     return {
@@ -388,20 +390,7 @@ export default {
     },
 
     // 点击复制
-    copy() {
-      navigator.clipboard
-        .readText(this.share_url)
-        .then(() =>
-          this.$notify({ title: "成功", message: "复制成功", type: "success" })
-        )
-        .catch(() =>
-          this.$notify({
-            title: "失败",
-            message: "复制失败!请手动复制",
-            type: "error",
-          })
-        );
-    },
+    copy() {},
     // 获取用户文件
     getUserFile(
       drive_id = this.userInfo.drive_id,
@@ -512,6 +501,13 @@ export default {
           else this.$message.error(message);
         })
         .catch(() => {});
+    },
+
+    // 获取文件链接
+    async getDownload_url() {
+      let { DOMAIN, download_url } = this.List[this.clickIndex];
+      let realDownload_url = DOMAIN + "/" + download_url;
+      copy.call(this, realDownload_url);
     },
 
     // 重命名

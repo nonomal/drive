@@ -1,4 +1,4 @@
-import { Empty, Button, Select, Option, Tabs, Pagination, MenuItemGroup, Submenu, Form, Menu, Breadcrumb, Tooltip, BreadcrumbItem, MenuItem, FormItem, TabPane, Link, Input, Aside, Container, Main, Checkbox, Tree, Dialog, Card, Progress, Col, Row, Popover, Dropdown, DropdownItem, DropdownMenu, Message, Loading, MessageBox } from 'element-ui'
+import { Empty, Button, Select, Option, Tabs, Pagination, MenuItemGroup, Submenu, Form, Menu, Breadcrumb, Tooltip, BreadcrumbItem, MenuItem, FormItem, TabPane, Link, Input, Aside, Container, Main, Checkbox, Tree, Dialog, Card, Progress, Col, Row, Popover, Dropdown, DropdownItem, DropdownMenu, Message, Loading, MessageBox, Notification } from 'element-ui'
 import Vue from 'vue'
 
 Vue.component(Button.name, Button)
@@ -39,3 +39,5 @@ Vue.use(Loading.directive);
 Vue.prototype.$confirm = MessageBox.confirm;
 Vue.prototype.$loading = Loading.service;
 Vue.prototype.$message = Message;
+Vue.prototype.$alert = MessageBox.alert;
+Vue.prototype.$notify = Notification
