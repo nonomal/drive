@@ -1,5 +1,5 @@
 <template>
-  <div class="folder">
+  <div class="folder" ref="folder">
     <div class="boundary" v-if="fileList.length">
       <el-row :gutter="20" v-for="(ele, key) in fileList" :key="key">
         <el-col :span="3" v-for="(item, index) in ele" :key="index">
@@ -242,6 +242,10 @@ export default {
       mouse_Info: { clientX: null, clientY: null },
       disabled: true,
       fullscreenLoading: false,
+      contextmenu: {
+        width: 124,
+        height: 280,
+      },
     };
   },
   mixins: [uploadFileMixin],
@@ -437,12 +441,28 @@ export default {
       else this.isFolder = false;
       if (isCollection == "0") this.collectionText = "收藏";
       else this.collectionText = "取消收藏";
-      this.menuShow = !this.menuShow;
-      let Ele = this.menuEle;
-      Ele.style.left = e.clientX - 10 + "px";
-      Ele.style.top = e.clientY + 20 + "px";
+
+      this.menuShow = !this.menuShow; //展示或隐藏右键菜单
+      this.setContextmenu(e);
     },
     handel() {},
+
+    //设置右键菜单位置
+    setContextmenu(e) {
+      let { height, width } = this.contextmenu;
+      let menuLeft = e.clientX,
+        menuTop = e.clientY;
+      let clientHeight =
+          window.innerHeight || document.documentElement.clientHeight,
+        clientWidth = window.innerWidth || document.documentElement.clientWidth;
+      // let { height, width } = this.menuEle.getBoundingClientRect();
+
+      if (clientHeight - menuTop < height) menuTop -= height;
+      if (clientWidth - menuLeft < width) menuLeft -= width;
+
+      this.menuEle.style.left = menuLeft + "px";
+      this.menuEle.style.top = menuTop + "px";
+    },
 
     // 删除文件
     delFile() {
@@ -482,6 +502,7 @@ export default {
       } else if (type.includes("video") || type.includes("image")) {
         this.SET_VIDEO_INFO(item);
         this.SET_IS_OPEN(true);
+        this.$videPlayer.show(item);
       } else if (type.includes("audio")) {
         this.audio_play = true;
         this.audio_info = item;

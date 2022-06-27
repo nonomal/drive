@@ -1,5 +1,5 @@
 <template>
-  <div class="video_play" v-show="isOpen">
+  <div class="video_play">
     <el-row :gutter="20">
       <el-col :span="6"
         ><i
@@ -14,9 +14,7 @@
     </el-row>
     <el-row>
       <el-col>
-        <div class="view" id="vb" v-show="file_type.includes('video')">
-          <NPlayer ref="player" :options="options" :set="setPlayer" />
-        </div>
+        <div class="dplayer" v-show="file_type.includes('video')"></div>
         <div class="images" v-if="file_type.includes('image')">
           <img :src="image_src" />
         </div>
@@ -26,46 +24,75 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from "vuex";
-
+import DPlayer from "dplayer";
 export default {
   data() {
     return {
       file_type: "",
       video_name: "",
       image_src: "",
-      options: {
-        src: "",
-        poster: "",
-      },
+      dp: null,
     };
   },
-  computed: {
-    ...mapState("file", ["isOpen", "video_info"]),
-  },
-  watch: {
-    video_info() {
-      let { download_url, DOMAIN, file_name, type, cover_url } =
-        this.video_info;
-      this.options.src = DOMAIN + "/" + download_url;
-      this.image_src = DOMAIN + "/" + download_url;
-      this.video_name = file_name;
-      this.file_type = type;
-      this.options.poster = DOMAIN + "/" + cover_url;
-      this.$options.player.updateOptions(this.options);
+  props: {
+    video_info: {
+      type: Object,
+      default: () => ({}),
     },
   },
   methods: {
     video_pause() {
-      this.SET_IS_OPEN(false);
-      this.$options.player.pause();
+      this.$videPlayer.hide();
     },
-    setPlayer(player) {
-      this.$options.player = player;
+    initDplay() {
+      this.container = document.querySelector(".dplayer");
+      if (!this.container || this.dp || !this.video_info) return;
+      let { download_url, DOMAIN, file_name, type, cover_url } =
+        this.video_info;
+      let options = {
+        theme: "#00A1D6",
+        loop: true,
+        lang: "zh-cn",
+        airplay: true,
+        screenshot: true,
+        hotkey: true,
+        preload: "auto",
+        volume: 0.7,
+        mutex: true,
+        logo: require("../../assets/logo1.gif"),
+        video: {
+          url: DOMAIN + "/" + download_url,
+          pic: DOMAIN + "/" + cover_url,
+        },
+        danmaku: {
+          id: "svdgdfb2e43",
+          api: "https://api.bilibili.com/x/v1/dm/list.so",
+        },
+        container: this.container,
+      };
+      this.video_name = file_name;
+      this.file_type = type;
+      this.dp = new DPlayer(options);
+      this.setNavigatorData(this.video_info);
     },
-    ...mapMutations("file", ["SET_IS_OPEN", "SET_VIDEO_INFO"]),
+    setNavigatorData({ DOMAIN, cover_url }) {
+      navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: this.video_name,
+        artwork: [
+          {
+            sizes: "320x180",
+            src: DOMAIN + "/" + cover_url,
+            type: "",
+          },
+        ],
+      });
+    },
   },
-  mounted() {},
+  mounted() {
+    this.$nextTick(() => {
+      this.initDplay();
+    });
+  },
 };
 </script>
 
@@ -108,111 +135,16 @@ export default {
       object-fit: cover;
     }
   }
-  .video-status {
-    width: 100%;
-    position: absolute;
-    bottom: -40px;
-    color: #fff;
-    transition: all 1s;
-  }
-  .video-status .controlRight {
-    position: absolute;
-    display: inline-block;
-    right: 40px;
-  }
-  .video-status i {
-    margin-left: 15px;
-    display: inline-block;
-    cursor: pointer;
-    color: #fff;
-  }
-  .video-status i:nth-child(4) {
-    font-size: 22px;
-  }
-  .video-status .controlRight .audio:hover {
-    color: teal;
-    animation: fullScreen 0.5s linear;
-  }
-  .video-status .controlRight .fullScree:hover {
-    color: teal;
-    animation: fullScreen 0.5s linear;
-  }
-  .video-status .controlRight .set:hover {
-    color: teal;
-    animation: set 0.5s linear;
-  }
-  .video-status i:nth-child(2) {
-    font-size: 22px;
-  }
-  .video-status .controlRight .audio {
-    font-size: 21px;
-  }
-  .video-status .controlRight .fullScree {
-    font-size: 21px;
-  }
-  .video-status .controlRight .set {
-    font-size: 25px;
-    right: 30px;
-  }
-  .video-status .controlBar {
-    width: 100%;
-    height: 4px;
-    left: 0;
-    display: inline-block;
-    background-color: #fff;
-    border-radius: 2px;
+  .dplayer {
+    max-width: 1000px;
+    height: 520px;
     position: relative;
-    vertical-align: middle;
-    margin: 10px 0 10px 0;
-  }
-  .video-status .controlBar:hover {
-    height: 10px;
-  }
-  .video-status .controlBar:hover .dian {
-    height: 100%;
-  }
-  .video-status .currentTime {
-    margin-left: 10px;
-  }
-  .video-status .currentTime,
-  .video-status .druation {
-    color: #fff;
-    font-size: 18px;
-  }
-  .video-status .controlBar .dian {
-    width: 0px;
-    height: 4px;
-    top: 0;
-    left: 0;
-    background-color: teal;
-    display: inline-block;
-    position: absolute;
-  }
-
-  video::-webkit-media-controls {
-    display: none !important;
-  }
-  @keyframes set {
-    100% {
-      transform: rotateZ(180deg);
+    margin: 0 auto;
+    top: 40px;
+    & /deep/ .dplayer-logo {
+      max-width: 100px;
+      max-height: 100px;
     }
-  }
-  @keyframes fullScreen {
-    0% {
-      transform: scale(0.9);
-    }
-    50% {
-      transform: scale(1.2);
-    }
-    100% {
-      transform: scale(0.9);
-    }
-  }
-
-  .full-screen {
-    position: fixed;
-    width: 100vw;
-    height: 100vh;
   }
 }
 </style>

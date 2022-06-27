@@ -1,6 +1,5 @@
 <template>
   <el-container>
-    <play />
     <el-aside width="auto" class="el-aside">
       <side-bar></side-bar>
     </el-aside>
@@ -15,10 +14,8 @@
 <script>
 import { mapActions, mapState } from "vuex";
 import SideBar from "../components/SideBar/sidebar.vue";
-import play from "../components/videoPlay/Play.vue";
 export default {
   components: {
-    play,
     SideBar,
   },
   computed: {

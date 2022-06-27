@@ -21,6 +21,7 @@ export default {
     percentage() {
       let { drive_used, drive_size } = this.userInfo;
       let result = parseInt((drive_used / drive_size) * 100) / 100;
+      if (result == 0.07) result = 0.08;
       this.percentageStatua(result);
       return result > 1 ? 1 : result;
     },
@@ -184,7 +185,6 @@ export default {
           v-if="!isNaN(percentage)"
           :percentage="percentage * 100"
           :color="customColor"
-          :format="format"
           class="jindutiao"
         ></el-progress>
       </div>

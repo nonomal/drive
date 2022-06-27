@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import NPlayer from "@nplayer/vue";
+import videoPlay from './components/videoPlay';
 
 import './elementUse'
 import VueLazyload from 'vue-lazyload';
@@ -11,6 +12,7 @@ Vue.use(VueLazyload, {
   loading: require('./assets/loading.gif'),
   error: require('./assets/error.png')
 })
+Vue.use(videoPlay)
 
 Vue.use(NPlayer)
 
