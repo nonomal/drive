@@ -1,28 +1,23 @@
 import { getUserInfo } from '../api/users'
 import { getUserUsedDrive } from '../api/file'
+import catchError from '../utils/catchError'
 import app from '../main'
 const state = {
     userInfo: {},
 }
 const actions = {
     async getUserInfo({ commit }) {
-        try {
-            let { userInfo, status, message } = (await getUserInfo())
-            if (status == 200) commit('SET_USERINFO', userInfo[0])
-            else app.$message.error(message)
-            // eslint-disable-next-line no-empty
-        } catch (error) { }
+        let [err, { userInfo, status, message }] = (await catchError(getUserInfo()))
+        if (err) app.$message.error(err)
+        if (status == 200) commit('SET_USERINFO', userInfo[0])
+        else app.$message.error(message)
 
     },
     async getUserDrive({ commit }) {
-        try {
-            let { data, status, message } = (await getUserUsedDrive({ drive_id: state.userInfo.drive_id }))
-            if (status == 200) commit('SET_USERINFO_DRIVE', data[0])
-            else app.$message.error(message)
-        } catch (error) {
-            console.error(error)
-        }
-
+        let [err, { data, status, message }] = (await catchError(getUserUsedDrive({ drive_id: state.userInfo.drive_id })))
+        if (err) app.$message.error(err)
+        if (status == 200) commit('SET_USERINFO_DRIVE', data[0])
+        else app.$message.error(message)
     }
 }
 const mutations = {
@@ -35,7 +30,7 @@ const mutations = {
     }
 }
 const getters = {
-    getUserInfo() {
+    getUserInfo(state) {
         return state.userInfo
     }
 }

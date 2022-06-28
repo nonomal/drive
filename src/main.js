@@ -2,7 +2,6 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import NPlayer from "@nplayer/vue";
 import videoPlay from './components/videoPlay';
 
 import './elementUse'
@@ -13,8 +12,6 @@ Vue.use(VueLazyload, {
   error: require('./assets/error.png')
 })
 Vue.use(videoPlay)
-
-Vue.use(NPlayer)
 
 
 Vue.config.productionTip = false

@@ -51,7 +51,7 @@ const routes = [
   }, {
     path: '/modifyCipher',
     name: 'modifyCipher',
-    component: () => import('../views/modifyCipher.vue')
+    component: () => import('../views/modifyCipher/modifyCipher.vue')
   }
 ]
 

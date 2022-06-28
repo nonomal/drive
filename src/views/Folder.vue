@@ -405,12 +405,17 @@ export default {
         limit: this.pageLimit,
         page: this.currentPage,
         parent_file_id,
-      }).then((res) => {
-        this.List = res.fileList;
-        this.DOMAIN = res.DOMAIN;
-        this.SET_FILE_TOTAL(res.fileList && res.fileList.length);
-        this.formatFileData(res.fileList);
-      });
+      })
+        .then((res) => {
+          let { fileList, DOMAIN } = res;
+          this.List = fileList;
+          this.DOMAIN = DOMAIN;
+          this.SET_FILE_TOTAL(fileList && res.fileList.length);
+          this.formatFileData(fileList);
+        })
+        .catch((err) => {
+          console.debug(err);
+        });
     },
 
     // 获取收藏文件
