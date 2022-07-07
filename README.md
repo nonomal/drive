@@ -27,7 +27,7 @@
 
 image
 
-![image-20220707210714499](D:\zhuomian\前端\网盘系统\前台\xiaopopan\images\image-20220707210714499.png)
+![image-20220707210714499](images/image-20220707210714499.png)
 
 audio
 
