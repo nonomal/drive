@@ -18,11 +18,12 @@ let uploadFileMixin = {
     methods: {
         // 上传文件
         async upload(e) {
+            var file = e.target.files[0];
+            if (!file) return;
             let { drive_used, drive_size } = this.userInfo;
             if (drive_used >= drive_size)
                 return this.$message.error("当前账户可用空间不足");
-            var file = e.target.files[0];
-            if (!file) return;
+
             this.upload_name = file.name;
             let start = 0;
             while (start <= file.size) {
@@ -71,6 +72,8 @@ let uploadFileMixin = {
             let time = format("YYYY-MM-DD hh:mm:ss");
             let { drive_id } = this.userInfo;
             let parent_file_id = this.parent_file_id;
+            let parent_folder = this.parent_folder
+            console.log(this);
             merge({
                 drive_id,
                 file_id,
@@ -78,6 +81,7 @@ let uploadFileMixin = {
                 parent_file_id,
                 file_size,
                 file_type,
+                parent_folder,
                 created_at: time,
                 updated_at: time,
             }).then(async (res) => {

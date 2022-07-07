@@ -59,11 +59,12 @@
       <el-pagination
         background
         layout="prev, pager, next"
-        :total="fileTotal"
         :page-size="pageLimit"
+        :page-count="totalPage"
         :current-page="currentPage"
         @prev-click="prevClick"
         @next-click="nextClick"
+        @current-change="nextClick"
       />
     </div>
     <transition name="slide-fade">
@@ -200,6 +201,7 @@ export default {
       "currentPage",
       "totalPage",
       "pageLimit",
+      "parent_folder",
     ]),
     ...mapState("sideBar", ["isCollapse", "styleClass"]),
   },
@@ -245,7 +247,7 @@ export default {
     // 搜索文件
     searchFile() {
       this.SET_ROUTER({
-        name: `${this.searchWord}的搜索结果`,
+        file_name: `${this.searchWord}的搜索结果`,
         path: Date.now(),
       });
       getSearch({
@@ -259,7 +261,7 @@ export default {
 
     // 导航后退
     goBack(item, index) {
-      this.SET_PARENT_FILE_ID(item.path);
+      this.SET_PARENT_FILE_ID({ parent_file_id: item.path });
       this.REMOVE_ROUTER(index + 1);
       this.$refs.folder.getUserFile();
     },

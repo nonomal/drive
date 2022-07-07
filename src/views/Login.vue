@@ -151,7 +151,7 @@
       </div>
     </div>
     <p class="icp">
-      ©{{ fullYear }} 小破盘 版权所有
+      ©{{ fullYear }} 小破盘
       <a href="//beian.miit.gov.cn">豫ICP备20017833号</a>
     </p>
   </div>
@@ -310,8 +310,8 @@ export default {
   width: 100vw;
   height: 100vh;
   user-select: none;
-  background-color: var(--login-background-color);
-  color: var(--login-font-color);
+  background-color: #ebeffe;
+  color: #000;
   .login-big-box {
     position: absolute;
     left: 50%;
@@ -321,7 +321,7 @@ export default {
     padding: 30px 20px 60px 20px;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 20px 40px var(--login-box-shadow-color);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   }
   .login-box {
     width: 350px;
@@ -336,33 +336,6 @@ export default {
       img {
         margin-right: 20px;
       }
-    }
-    .el-tabs--border-card {
-      background-color: var(--login-background-color);
-    }
-    & /deep/ .el-tabs__nav.is-stretch > div {
-      background-color: var(--login-background-color);
-    }
-    & /deep/ .el-input-group input,
-    & /deep/ .el-select-dropdown,
-    & /deep/ .el-input__inner {
-      color: var(--login-font-color);
-      background-color: var(--login-background-color);
-      border-color: var(--login-background-color);
-    }
-    & /deep/ .el-select-dropdown__item {
-      color: var(--login-font-color);
-      background-color: var(--login-background-color);
-    }
-    & /deep/ .el-select-dropdown__item.hover,
-    & /deep/ .el-select-dropdown__item:hover {
-      background-color: var(--login-background-hover-color);
-    }
-    & /deep/ .el-form-item__content {
-      border: 1px solid var(--login-border-color);
-    }
-    & /deep/ button {
-      opacity: var(--login-img-opacity);
     }
   }
   .icp {

@@ -16,7 +16,11 @@ body {
 
   --login-img-opacity: 1;
   --login-font-color: #000;
+  --login-border-color: #dcdfe6;
+  --login-background-hover-color: #fff;
   --login-background-color: #ebeffe;
+  --login-transparent-color: transparent;
+  --login-box-shadow-color: rgba(0, 0, 0, 0.2);
 }
 ul.menu {
   margin: 0;
@@ -35,13 +39,14 @@ ul.menu {
   :root {
     --file-font-color: #000;
     --file-time-font-color: #000;
-    --file-background-color: #fff;
+    --file-background-color: #1a202c;
 
     --login-font-color: #aaa;
     --login-img-opacity: 0.5;
     --login-border-color: #fff;
-    --login-background-color: #000;
+    --login-background-color: #1a202c;
     --login-background-hover-color: #555;
+    --login-transparent-color: #1a202c;
     --login-box-shadow-color: rgba(255, 255, 255, 0.2);
   }
 }

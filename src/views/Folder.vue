@@ -45,11 +45,7 @@
     </div>
 
     <transition name="slide-fade">
-      <div
-        class="fileMenuAction"
-        v-show="menuShow"
-        @click="menuShow = !menuShow"
-      >
+      <div class="fileMenuAction" v-show="menuShow" @click="menuShow = false">
         <ul class="fileMenu" ref="fileMenu">
           <li @click="download_url" v-if="!isFolder">下载</li>
           <li @click="getDownload_url" v-if="!isFolder">获取文件直链</li>
@@ -73,63 +69,6 @@
     </transition>
 
     <transition name="slide-fade">
-      <div class="audio_play" v-show="audio_play" ref="audio_playEle" v-drag>
-        <div class="audio_top">
-          <div class="audio_img">
-            <img
-              v-lazy="audio_info.DOMAIN + '/' + audio_info.cover_url"
-              alt=""
-            />
-            <span class="icon_box" @click="play" v-if="audioPaused">
-              <svg
-                t="1629460803482"
-                class="icon"
-                viewBox="0 0 1024 1024"
-                version="1.1"
-                xmlns="http://www.w3.org/2000/svg"
-                p-id="2418"
-                width="20"
-                height="20"
-              >
-                <path
-                  d="M128 106.858667C128 94.976 137.621333 85.333333 149.12 85.333333h85.76c11.648 0 21.12 9.6 21.12 21.525334V917.12c0 11.882667-9.621333 21.525333-21.12 21.525333H149.12A21.290667 21.290667 0 0 1 128 917.141333V106.88z m640 0c0-11.882667 9.621333-21.525333 21.12-21.525334h85.76c11.648 0 21.12 9.6 21.12 21.525334V917.12c0 11.882667-9.621333 21.525333-21.12 21.525333h-85.76a21.290667 21.290667 0 0 1-21.12-21.525333V106.88z"
-                  fill="#ffffff"
-                  p-id="2419"
-                ></path>
-              </svg>
-            </span>
-            <span class="play" @click.stop="play" v-else>
-              <svg viewBox="0 0 1024 1024">
-                <use xlink:href="#PDSArrowRightTriangle">
-                  <svg id="PDSArrowRightTriangle" viewBox="0 0 1024 1024">
-                    <path
-                      d="M689.066667 480l-196.266667-177.066667c-27.733333-25.6-70.4-6.4-70.4 32v356.266667c0 36.266667 44.8 55.466667 70.4 32l196.266667-177.066667c17.066667-19.2 17.066667-49.066667 0-66.133333z"
-                    ></path>
-                  </svg>
-                </use>
-              </svg>
-            </span>
-          </div>
-          <div class="audio_name">{{ audio_info.file_name }}</div>
-          <span @click="close">
-            <i class="el-icon-close"></i>
-          </span>
-          <div class="current_time">{{ currentTimes }} / {{ duration }}</div>
-        </div>
-        <audio
-          :src="audio_info.DOMAIN + '/' + audio_info.download_url"
-          hidden
-          ref="audio"
-          @timeupdate="update_time"
-        ></audio>
-        <div class="control">
-          <div class="slide_rail" @click="changeProgress"></div>
-          <div class="slider" ref="slider"></div>
-        </div>
-      </div>
-    </transition>
-
-    <transition name="slide-fade">
       <div class="fileDetailInfo">
         <el-dialog
           :title="fileInfo.file_name"
@@ -144,25 +83,26 @@
             <div class="h5">详细信息</div>
             <ul>
               <li>
-                <p>
-                  <i class="el-icon-info"></i>{{ fileInfo.file_name
-                  }}<span class="file_size" :title="fileInfo.file_size + 'kb'"
-                    >{{ fileInfo.file_size | KbToMb }} M</span
-                  >
-                </p>
+                <div class="col">
+                  <i class="el-icon-info"></i>
+                  <div class="filename">{{ fileInfo.file_name }}</div>
+                  <span class="file_size" :title="fileInfo.file_size + 'kb'">
+                    {{ fileInfo.file_size | KbToMb }} M
+                  </span>
+                </div>
               </li>
               <li>
-                <p><i class="el-icon-receiving"></i>文件位置</p>
-                <span>root</span>
+                <div class="col"><i class="el-icon-receiving"></i>文件位置</div>
+                <span>{{ fileInfo.parent_folder }}</span>
               </li>
               <li>
-                <p><i class="el-icon-date"></i>创建时间</p>
+                <div class="col"><i class="el-icon-date"></i>创建时间</div>
                 <span>{{
                   format("YYYY-MM-DD hh:mm:ss", fileInfo.created_at)
                 }}</span>
               </li>
               <li>
-                <p><i class="el-icon-time"></i>修改时间</p>
+                <div class="col"><i class="el-icon-time"></i>修改时间</div>
                 <span>{{
                   format("YYYY-MM-DD hh:mm:ss", fileInfo.updated_at)
                 }}</span>
@@ -226,13 +166,6 @@ export default {
       isFolder: false,
       collectionText: "收藏",
       reName: null,
-      audio_play: false,
-      audio_info: {},
-      audioEle: null,
-      sliderEle: null,
-      duration: null,
-      audioPaused: false,
-      currentTimes: "00:00",
       dialogRename: false,
       dialogFileInfo: false,
       fileInfo: {},
@@ -246,6 +179,8 @@ export default {
         width: 124,
         height: 280,
       },
+      imageData: [],
+      showCol: 10,
     };
   },
   mixins: [uploadFileMixin],
@@ -267,6 +202,7 @@ export default {
       "favorite",
       "currentPage",
       "pageLimit",
+      "parent_folder",
     ]),
   },
   watch: {
@@ -275,32 +211,6 @@ export default {
     },
     userInfo() {
       this.updateFileList();
-    },
-  },
-  directives: {
-    drag(el) {
-      el.onmousedown = function (e) {
-        var disx = e.pageX - el.offsetLeft;
-        var disy = e.pageY - el.offsetTop;
-        document.onmousemove = function (e) {
-          el.style.left = e.pageX - disx + "px";
-          el.style.top = e.pageY - disy + "px";
-          let clientWidth = window.innerWidth - 230;
-          let clientHeight = window.innerHeight - 75;
-          let minLeft = 250;
-          if (parseInt(el.style.left) >= clientWidth)
-            el.style.left = clientWidth + "px";
-          if (parseInt(el.style.top) >= clientHeight)
-            el.style.top = clientHeight + "px";
-          if (parseInt(el.style.left) <= minLeft)
-            el.style.left = minLeft + "px";
-          if (parseInt(el.style.top) <= 0) el.style.top = 0 + "px";
-        };
-        document.onmouseup = function () {
-          document.onmousemove = null;
-          document.onmouseup = null;
-        };
-      };
     },
   },
   methods: {
@@ -447,10 +357,21 @@ export default {
       if (isCollection == "0") this.collectionText = "收藏";
       else this.collectionText = "取消收藏";
 
-      this.menuShow = !this.menuShow; //展示或隐藏右键菜单
+      this.menuShow = true; //展示或隐藏右键菜单
       this.setContextmenu(e);
     },
     handel() {},
+
+    // 格式化图片信息
+    formatImageData(fileData) {
+      this.imageData = fileData
+        .filter((item) => item.type.includes("image"))
+        .map((item) => ({
+          src: item.DOMAIN + "/" + item.cover_url,
+          imageName: item.file_name,
+          file_id: item.file_id,
+        }));
+    },
 
     //设置右键菜单位置
     setContextmenu(e) {
@@ -460,7 +381,6 @@ export default {
       let clientHeight =
           window.innerHeight || document.documentElement.clientHeight,
         clientWidth = window.innerWidth || document.documentElement.clientWidth;
-      // let { height, width } = this.menuEle.getBoundingClientRect();
 
       if (clientHeight - menuTop < height) menuTop -= height;
       if (clientWidth - menuLeft < width) menuLeft -= width;
@@ -502,19 +422,38 @@ export default {
       let { type, file_id, file_name } = item;
       if (type == "folder") {
         this.getUserFile(this.userInfo.drive_id, file_id);
-        this.SET_PARENT_FILE_ID(file_id);
+        console.log(item);
+        this.SET_PARENT_FILE_ID({
+          parent_file_id: file_id,
+          parent_folder: file_name,
+        });
         this.SET_ROUTER({ file_name, path: file_id });
-      } else if (type.includes("video") || type.includes("image")) {
+      } else if (type.includes("video")) {
         this.SET_VIDEO_INFO(item);
         this.SET_IS_OPEN(true);
-        this.$videPlayer.show(item);
+        this.$videoPlayer.show(item);
       } else if (type.includes("audio")) {
-        this.audio_play = true;
-        this.audio_info = item;
+        this.$audioPlayer.show(item);
       } else if (type.includes("search")) {
-        this.SET_PARENT_FILE_ID(file_id);
+        this.SET_PARENT_FILE_ID({ parent_file_id: file_id });
         this.SET_ROUTER({ file_name, path: file_id });
+      } else if (type.includes("image")) {
+        this.formatImageData(this.List);
+        let currentIndex = this.imageData.findIndex(
+          (info) => info.file_id == item.file_id
+        );
+        this.$photoview(this.getCurrentImageData(currentIndex), currentIndex);
       }
+    },
+
+    getCurrentImageData(currentIndex) {
+      let middle = this.showCol / 2;
+      let start = currentIndex - middle,
+        end = currentIndex + middle,
+        leftValue = Math.abs(start);
+      if (start < 0) start = 0;
+      if (leftValue != 0) end += leftValue;
+      return this.imageData.slice(start, end);
     },
 
     // 下载
@@ -598,86 +537,11 @@ export default {
       let fileItem = this.$refs.fileItem;
       fileItem[index].classList.add("active");
     },
-
-    // 音乐时间格式化
-    numToMinute(num) {
-      num = Number(num);
-      let minute = parseInt(num / 60);
-      let second = parseInt(num - minute * 60);
-      if (second <= 9) {
-        second = "0" + second;
-      }
-      if (minute <= 9) {
-        minute = "0" + minute;
-      }
-      if (num > 60 * 60) {
-        let hours = parseInt((num / 60) * 60);
-        return `${hours}:${minute}:${second}`;
-      }
-      return `${minute}:${second}`;
-    },
-
-    // 播放
-    play() {
-      if (this.audioEle.paused) {
-        this.audioEle.play();
-        this.audioPaused = !this.audioPaused;
-      } else {
-        this.audioEle.pause();
-        this.audioPaused = !this.audioPaused;
-      }
-    },
-
-    // 关闭
-    close() {
-      this.audio_play = false;
-      this.audioEle.pause();
-      this.audioPaused = true;
-      this.sliderEle.style.left = 0;
-    },
-
-    // 音乐是否加载完毕
-    audioEnd() {
-      this.audioPaused = !this.audioPaused;
-    },
-
-    // 音乐进度条
-    changeProgress(e) {
-      var disx = e.offsetX - 5;
-      var totalLength = 210;
-      let { duration } = this.audioEle;
-      var currentSecond = parseInt((disx / totalLength) * duration);
-      this.sliderEle.style.left = disx + "px";
-      this.audioEle.currentTimes = this.numToMinute(currentSecond);
-      this.audioEle.currentTime = currentSecond;
-    },
-
-    // 音乐进度条时间更改
-    update_time() {
-      this.init_audio_time();
-    },
-
-    // 初始化音乐进度条时间
-    init_audio_time() {
-      var totalLength = 210;
-      let { currentTime, duration } = this.audioEle;
-      this.sliderEle.style.left =
-        parseInt((currentTime / duration) * totalLength) + "px";
-      this.currentTimes = this.numToMinute(parseInt(currentTime));
-      this.duration = this.numToMinute(parseInt(duration));
-    },
   },
   mounted() {
     this.menuEle = this.$refs.fileMenu;
-    this.audioEle = this.$refs.audio;
     this.sliderEle = this.$refs.slider;
-    this.audioEle.addEventListener("canplaythrough", this.init_audio_time);
-    this.audioEle.addEventListener("end", this.audioEnd);
     this.updateFileList();
-  },
-  destroyed() {
-    this.audioEle.removeEventListener("canplaythrough", this.init_audio_time);
-    this.audioEle.removeEventListener("end", this.audioEnd);
   },
 };
 </script>
@@ -815,107 +679,6 @@ export default {
       }
     }
   }
-  .audio_play {
-    height: 60px;
-    width: 220px;
-    padding: 10px 5px 5px;
-    cursor: move;
-    border-radius: 5px;
-    position: absolute;
-    box-shadow: 0px 0px 8px #aaa;
-    background-color: #fff;
-    .audio_top {
-      display: flex;
-      user-select: none;
-      .audio_img {
-        width: 50px;
-        height: 50px;
-        position: relative;
-        img {
-          width: 100%;
-          height: 100%;
-        }
-        span.icon_box {
-          cursor: pointer;
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%);
-          background-color: #aaa;
-          padding: 2px;
-          border-radius: 50%;
-          width: 25px;
-          height: 25px;
-          .icon {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-          }
-        }
-        span.play {
-          z-index: 1;
-          cursor: pointer;
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          display: inline-block;
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          background-color: rgba(162, 162, 166, 0.9);
-          transform: translate(-50%, -50%);
-          svg {
-            width: 30px;
-            height: 30px;
-            color: #fff;
-            fill: currentColor;
-            overflow: hidden;
-          }
-        }
-      }
-      i {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        cursor: pointer;
-      }
-      .audio_name {
-        width: 130px;
-        padding-left: 10px;
-        font-size: 13px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-      }
-      .current_time {
-        font-size: 12px;
-        position: absolute;
-        bottom: 10px;
-        right: 5px;
-      }
-    }
-    .control {
-      margin-top: 5px;
-      position: relative;
-      cursor: pointer;
-      .slide_rail {
-        width: 100%;
-        height: 4px;
-        background-color: #e3e7ed;
-      }
-      .slider {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        position: absolute;
-        top: -5px;
-        left: 0;
-        border: 3px solid #e3e7ed;
-        background-color: #fff;
-      }
-    }
-  }
   .fileDetailInfo {
     width: 300px;
     position: relative;
@@ -938,14 +701,25 @@ export default {
       li {
         list-style: none;
         padding: 3px;
-        p {
+        div.col {
           margin: 5px;
           padding: 0;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
           i {
             margin-right: 10px;
           }
+          .filename {
+            flex-shrink: 0;
+            width: 50%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
           span.file_size {
             cursor: pointer;
+            padding-left: 20px;
           }
         }
         span {

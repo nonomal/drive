@@ -1,12 +1,12 @@
-import Play from "./Play.vue"
+import Audio from "./Audio.vue"
 
 export default {
     install(Vue) {
-        let PlayComponent = Vue.extend(Play)
+        let AudioComponent = Vue.extend(Audio)
         let app = null
-        Vue.prototype.$videoPlayer = {
+        Vue.prototype.$audioPlayer = {
             show(option) {
-                app = new PlayComponent({ propsData: { video_info: option } })
+                app = new AudioComponent({ propsData: { audio_info: option } })
                 app.$mount()
                 document.body.appendChild(app.$el)
             },

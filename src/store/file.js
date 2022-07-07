@@ -2,6 +2,7 @@ import { getFileTotal } from '../api/file'
 import app from '../main'
 const state = {
     parent_file_id: "root",
+    parent_folder: '',
     video_info: null,
     isOpen: false,
     favorite: 'file',
@@ -34,7 +35,11 @@ const mutations = {
         state.currentPage = payload
     },
     SET_PARENT_FILE_ID(state, payload) {
-        state.parent_file_id = payload
+        let { parent_file_id, parent_folder } = payload
+
+        state.parent_file_id = parent_file_id
+        state.parent_folder = parent_folder
+        console.log(state);
     },
     SET_VIDEO_INFO(state, payload) {
         state.video_info = payload

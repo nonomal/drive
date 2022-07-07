@@ -1,11 +1,10 @@
 <template>
   <div class="LoginLeftArea">
     <img id="canvasImg" src="https://api.dujin.org/bing/1920.php" alt="" />
-    <div class="text">
-      <!-- {{ text }} -->
-      我来鹅城只干两件事，公平，公平，公平，还是TMD的公平。
+    <div class="text" v-if="text">
+      {{ text }}
     </div>
-    <div class="author">-----{{ author }} 姜文</div>
+    <div class="author" v-if="author">-----{{ author }}</div>
   </div>
 </template>
 <script>
@@ -14,8 +13,8 @@ export default {
   data() {
     return {
       color: "",
-      text: "",
-      author: "",
+      text: "我来鹅城只干两件事，公平，公平，公平，还是TMD的公平。",
+      author: "姜文",
     };
   },
   methods: {
