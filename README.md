@@ -35,9 +35,9 @@ audio
 
 video
 
-![](images/image-20220419093648800.png)
+![image-20220708214740626](images/image-20220708214740626.png)
 
-由于这个video/controls是我学js时写的，有点low，后期打算换个好用的video播放库
+使用第三方组件  [nplayer](https://github.com/woopen/nplayer)
 
 用户信息
 
