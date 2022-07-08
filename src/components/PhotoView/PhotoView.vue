@@ -75,6 +75,11 @@ export default {
   left: 0;
   top: 0;
   background-color: rgba(0, 0, 0, 0.5);
+  --font-color: #000;
+  --file-name-color: #fff;
+  --img-brightness: 100%;
+  --background-color: #fff;
+  --background-menu-color: rgba(0, 0, 0, 0.5);
   .close-btn {
     position: absolute;
     right: 0;
@@ -87,7 +92,8 @@ export default {
     z-index: 444;
     cursor: pointer;
     user-select: none;
-    background-color: #fff;
+    color: var(--font-color);
+    background-color: var(--background-color);
   }
   .photo-inner {
     width: 100%;
@@ -114,5 +120,14 @@ export default {
 .v-enter-active,
 .v-leave-active {
   transition: all 0.3s ease-in-out;
+}
+@media (prefers-color-scheme: dark) {
+  .photo-view {
+    --font-color: #aaa;
+    --img-brightness: 50%;
+    --background-color: #000;
+    --file-name-color: #aaa;
+    --background-menu-color: rgba(255, 255, 255, 0.5);
+  }
 }
 </style>

@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     video_pause() {
-      this.$videPlayer.hide();
+      this.$videoPlayer.hide();
     },
     initDplay() {
       this.container = document.querySelector(".dplayer");

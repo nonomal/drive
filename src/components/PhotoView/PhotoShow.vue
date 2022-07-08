@@ -58,6 +58,7 @@ export default {
       handler(newVal) {
         if (newVal == this.$vnode.key) {
           setCenterPosition(this.zoomObj.zoomDom);
+          this.setFileColor();
           this.rotate = 0;
           this.zoomObj.zoomDom.style.transform = `scale(${this.zoomObj.zoom}) rotate(${this.rotate}deg)`;
         }
@@ -187,7 +188,7 @@ export default {
           getImageColor(this.imgSrc.src, "opposition", "HEX")
         );
         err
-          ? (this.fileColor = { mainColor: "#fff", oppositionColor: "#000" })
+          ? (this.fileColor = { mainColor: "", oppositionColor: "#000" })
           : (this.fileColor = color);
       }
     },
@@ -223,6 +224,7 @@ export default {
     transition: all 0.3s ease-out;
     margin-left: -300px;
     margin-top: -300px;
+    filter: brightness(var(--img-brightness));
   }
   p.imageName {
     position: absolute;
@@ -230,12 +232,12 @@ export default {
     left: 50%;
     transform: translateX(-50%);
     z-index: 99;
-    color: #aaa;
+    color: var(--file-name-color);
     padding: 5px 10px;
     line-height: 32px;
     text-align: center;
     border-radius: 10px;
-    background-color: #fff;
+    background-color: var(--background-color);
   }
 }
 </style>

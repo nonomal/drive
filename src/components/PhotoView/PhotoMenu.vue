@@ -88,7 +88,7 @@ export default {
   transform: translateX(-50%);
   padding: 8px 10px;
   border-radius: 5px;
-  background-color: #fff;
+  background-color: var(--background-color);
   z-index: 99;
   .menu-item {
     height: 25px;
@@ -97,11 +97,11 @@ export default {
     cursor: pointer;
     margin: 0 7px;
     box-sizing: border-box;
-    color: #000;
+    color: var(--font-color);
     font-size: 18px;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: var(--background-menu-color);
     }
     i {
       display: block;
