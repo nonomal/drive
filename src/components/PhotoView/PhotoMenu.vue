@@ -32,13 +32,13 @@ export default {
     doClick(action) {
       switch (action) {
         case "scaleB":
-          this.$bus.$emit("scaleB");
+          this.$bus.$emit("scaleB", this.currentIndex);
           break;
         case "scaleS":
-          this.$bus.$emit("scaleS");
+          this.$bus.$emit("scaleS", this.currentIndex);
           break;
         case "autoScale":
-          this.$bus.$emit("autoScale");
+          this.$bus.$emit("autoScale", this.currentIndex);
           break;
         case "next":
           this.switchImage("next");
@@ -47,7 +47,7 @@ export default {
           this.switchImage("prev");
           break;
         case "rotate":
-          this.$bus.$emit("imgRotate");
+          this.$bus.$emit("imgRotate", this.currentIndex);
           break;
         case "save":
           this.$bus.$emit("saveImage", this.currentIndex);
@@ -70,7 +70,7 @@ export default {
         if (this.currentIndex == this.imageLength - 1) this.changeIndex(0);
         else this.changeIndex(this.currentIndex + 1);
       }
-      this.$bus.$emit("clearImageStyle");
+      this.$bus.$emit("clearImageStyle", this.currentIndex);
     },
   },
 };

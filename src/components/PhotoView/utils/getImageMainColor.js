@@ -11,7 +11,9 @@ export default async function getImageColor(url, colorType, type) {
             document.body.appendChild(canvasELe)
             resolve(formatData(ctx.getImageData(0, 0, width, height), colorType, type))
             image.remove()
-            console.log(image);
+            image = null;
+            canvasELe.remove()
+            canvasELe = null
         }).catch(error => {
             reject(error)
         })
@@ -25,7 +27,7 @@ function fetchImage(url) {
         image.src = url
         // 设置图片跨域 ，图片的跨域资源请求不需要凭证标志
         image.crossOrigin = 'anonymous'
-        // document.body.appendChild(image)
+        document.body.appendChild(image)
         image.onload = resolve.bind(null, image)
         image.onerror = function () {
             reject(new Error(`cannot load image: ${url}`))

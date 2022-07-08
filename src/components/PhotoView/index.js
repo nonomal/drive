@@ -1,6 +1,7 @@
 import PhotoView from './PhotoView'
 import VueLazyload from 'vue-lazyload'
 import { isObject } from './utils/getDataType'
+import setCenterPosition from './utils/setCenterPosition'
 export default {
     install(Vue, vueLazyConfig) {
         Vue.component(PhotoView.name, PhotoView)
@@ -23,7 +24,17 @@ function setVueLazy(Vue, vueLazyConfig) {
         Vue.use(VueLazyload, {
             loading: require('./assets/loading.gif'),
             error: require('./assets/error.png'),
-            perload: 1
+            perload: 1,
+            attempt: 1,
+            adapter: {
+                loaded({ el }) {
+                    if (el.classList.contains('show-big-pic')) {
+                        el.onload = function () {
+                            setCenterPosition(el)
+                        }
+                    }
+                }
+            }
         })
     } else if (isObject(vueLazyConfig)) {
         Vue.use(VueLazyload, vueLazyConfig)

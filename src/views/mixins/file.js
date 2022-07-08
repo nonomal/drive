@@ -73,7 +73,6 @@ let uploadFileMixin = {
             let { drive_id } = this.userInfo;
             let parent_file_id = this.parent_file_id;
             let parent_folder = this.parent_folder
-            console.log(this);
             merge({
                 drive_id,
                 file_id,

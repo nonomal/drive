@@ -36,10 +36,8 @@ const mutations = {
     },
     SET_PARENT_FILE_ID(state, payload) {
         let { parent_file_id, parent_folder } = payload
-
         state.parent_file_id = parent_file_id
         state.parent_folder = parent_folder
-        console.log(state);
     },
     SET_VIDEO_INFO(state, payload) {
         state.video_info = payload
