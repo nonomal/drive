@@ -12,6 +12,7 @@
         <template v-for="(item, index) in imageData">
           <photo-show
             :imgSrc="item"
+            :currentIndex="currentIndex"
             v-show="index == currentIndex"
             :key="index"
           ></photo-show>

@@ -29,7 +29,11 @@ export default {
   name: "PhotoShow",
   props: {
     imgSrc: Object,
-    currentIndex: Number,
+    currentIndex: {
+      type: Number,
+      default: 0,
+    },
+    isShow: Boolean,
   },
   data() {
     return {
@@ -46,6 +50,15 @@ export default {
       isMove: false,
       fileColor: {},
     };
+  },
+  watch: {
+    currentIndex: {
+      handler(newVal) {
+        if (newVal == this.$vnode.key) {
+          this.setCenter(this.zoomObj.zoomDom);
+        }
+      },
+    },
   },
   computed: {
     backgroundColor() {
@@ -126,8 +139,9 @@ export default {
     clearImageStyle() {
       let { zoomDom } = this.zoomObj;
       if (zoomDom) {
-        zoomDom.style.transform = `translate(-50%, -50%)`;
-        (this.zoomObj.zoom = 1), (this.zoomObj.zoomIn = true);
+        this.setCenter(zoomDom);
+        this.zoomObj.zoom = 1;
+        this.zoomObj.zoomIn = true;
       }
     },
     autoScale() {
@@ -163,22 +177,27 @@ export default {
       zoomDom.style.top = "50%";
     },
     autoCenterArea(zoomDom) {
-      let _this = this;
+      // let _this = this;
       zoomDom.onload = function () {
-        _this.setCenter(zoomDom);
+        // _this.setCenter(zoomDom);
       };
     },
+    async mountInvoid() {
+      this.zoomObj.zoomDom = this.$refs.img;
+      this.mountHandle();
+      if (this.currentIndex == this.$vnode.key) {
+        this.autoCenterArea(this.zoomObj.zoomDom);
+      }
+      if (this.$refs.img) this.$refs.img.onmouseup = this.mouseUp;
+      let [err, color] = await catchError(
+        getImageColor(this.imgSrc.src, "opposition", "HEX")
+      );
+      if (err) this.fileColor = { mainColor: "#fff", oppositionColor: "#000" };
+      else this.fileColor = color;
+    },
   },
-  async mounted() {
-    this.zoomObj.zoomDom = this.$refs.img;
-    this.mountHandle();
-    this.autoCenterArea(this.zoomObj.zoomDom);
-    if (this.$refs.img) this.$refs.img.onmouseup = this.mouseUp;
-    let [err, color] = await catchError(
-      getImageColor(this.imgSrc.src, "opposition", "HEX")
-    );
-    if (err) this.fileColor = { mainColor: "#fff", oppositionColor: "#000" };
-    else this.fileColor = color;
+  mounted() {
+    this.mountInvoid();
   },
   beforeDestroy() {
     this.destoryHandle();

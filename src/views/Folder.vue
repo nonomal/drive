@@ -422,7 +422,6 @@ export default {
       let { type, file_id, file_name } = item;
       if (type == "folder") {
         this.getUserFile(this.userInfo.drive_id, file_id);
-        console.log(item);
         this.SET_PARENT_FILE_ID({
           parent_file_id: file_id,
           parent_folder: file_name,

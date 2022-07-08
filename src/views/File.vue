@@ -231,7 +231,6 @@ export default {
     // 下载文件
     download_url() {
       let { download_url, name } = this.fileList[this.clickIndex];
-      console.log(download_url, name);
       var eleLink = document.createElement("a");
       eleLink.download = name;
       eleLink.style.display = "none";
@@ -239,7 +238,6 @@ export default {
       // 触发点击
       document.body.appendChild(eleLink);
       eleLink.click();
-      console.log(eleLink);
       // 然后移除
       document.body.removeChild(eleLink);
     },
