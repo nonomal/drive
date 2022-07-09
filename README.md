@@ -37,7 +37,7 @@ video
 
 ![image-20220708214740626](images/image-20220708214740626.png)
 
-使用第三方组件  [nplayer](https://github.com/woopen/nplayer)
+使用第三方组件  [dplayer](https://github.com/DIYgod/DPlayer)
 
 用户信息
 
