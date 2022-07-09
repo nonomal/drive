@@ -5,20 +5,15 @@ import store from './store'
 import videoPlay from './components/videoPlay';
 import audioPlay from './components/Audio/index'
 import PhotoView from './components/PhotoView'
+import directives from './directives'
 
-import './elementUse'
-// import VueLazyload from 'vue-lazyload';
-// Vue.use(VueLazyload, {
-//   preload: 1,
-//   loading: require('./assets/loading.gif'),
-//   error: require('./assets/error.png')
-// })
+
 Vue.use(videoPlay)
 Vue.use(audioPlay)
 Vue.use(PhotoView, true)
-
+Vue.use(directives)
 Vue.config.productionTip = false
-
+import './elementUse'
 let app = new Vue({
   router,
   store,

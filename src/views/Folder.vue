@@ -60,7 +60,11 @@
 
     <transition name="slide-fade">
       <el-dialog title="提示" :visible.sync="dialogRename" width="30%" center>
-        <el-input placeholder="重命名" v-model="reName"></el-input>
+        <el-input
+          placeholder="重命名"
+          v-model="reName.prefixname"
+          v-focus
+        ></el-input>
         <span slot="footer" class="dialog-footer">
           <el-button @click="dialogRename = false">取 消</el-button>
           <el-button type="primary" @click="re_name">确 定</el-button>
@@ -165,7 +169,10 @@ export default {
       clickOrIndex: null,
       isFolder: false,
       collectionText: "收藏",
-      reName: null,
+      reName: {
+        extname: "",
+        prefixname: "",
+      },
       dialogRename: false,
       dialogFileInfo: false,
       fileInfo: {},
@@ -478,17 +485,21 @@ export default {
     modify_name() {
       this.dialogRename = true;
       let filename = this.List[this.clickIndex].file_name;
-      this.reName = filename.slice(0, filename.lastIndexOf("."));
+      let index = filename.lastIndexOf(".");
+      this.reName.prefixname = filename.slice(0, index);
+      this.reName.extname = filename.slice(index);
     },
 
     // 重命名
     async re_name() {
       let { drive_id } = this.userInfo;
       let { file_id, type } = this.List[this.clickIndex];
+      let { extname, prefixname } = this.reName;
+      let filename = prefixname + extname;
       let { status, message } = await modify({
         drive_id,
         file_id,
-        filename: this.reName,
+        filename,
         type,
         updated_at: format("YYYY-MM-DD hh:mm:ss"),
       });

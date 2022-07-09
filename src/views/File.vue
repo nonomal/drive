@@ -43,6 +43,7 @@
         ></el-input>
       </el-col>
     </el-row>
+
     <div class="breadcrumb">
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item v-for="(item, index) in routers" :key="index">
@@ -52,9 +53,11 @@
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
+
     <div class="fileList">
       <Folder ref="folder" :searchFileItem="searchFileItem"></Folder>
     </div>
+
     <div class="file-page">
       <el-pagination
         background
@@ -67,6 +70,7 @@
         @current-change="nextClick"
       />
     </div>
+
     <transition name="slide-fade">
       <div
         class="footerMenu"
@@ -125,6 +129,7 @@
         </div>
       </div>
     </transition>
+
     <div class="mkdir">
       <el-dialog
         title="提示"
@@ -142,6 +147,7 @@
         </span>
       </el-dialog>
     </div>
+
     <transition name="slide-to-right">
       <div class="upload_file_state" v-loading="loading" v-if="upload_Ele">
         <el-card class="box-card">
