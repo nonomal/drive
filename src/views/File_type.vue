@@ -20,19 +20,31 @@
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="audio" v-else-if="type.includes('audio')">
-      <img v-lazy="require('../assets/audio.png')" />
+      <img :src="require('../assets/mp3.svg')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="folder_img" v-else-if="type.includes('folder')">
-      <img v-lazy="require('../assets/folder.png')" />
+      <img :src="require('../assets/folder.svg')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="text" v-else-if="type.includes('text')">
-      <img v-lazy="require('../assets/folder.png')" />
+      <img :src="require('../assets/txt.svg')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
     <div class="zip" v-else-if="type.includes('zip')">
-      <img v-lazy="require('../assets/zip.png')" />
+      <img :src="require('../assets/zip.svg')" />
+      <i class="el-icon-star-on" v-if="isCollection"></i>
+    </div>
+    <div class="zip" v-else-if="type.includes('exe')">
+      <img :src="require('../assets/exe.svg')" />
+      <i class="el-icon-star-on" v-if="isCollection"></i>
+    </div>
+    <div class="zip" v-else-if="type.includes('pdf')">
+      <img :src="require('../assets/pdf.svg')" />
+      <i class="el-icon-star-on" v-if="isCollection"></i>
+    </div>
+    <div class="zip" v-else-if="type.includes('doc')">
+      <img :src="require('../assets/doc.svg')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
   </div>
