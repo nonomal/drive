@@ -31,19 +31,25 @@
       <img :src="require('../assets/txt.svg')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
-    <div class="zip" v-else-if="type.includes('zip')">
+    <div class="zip" v-else-if="zip.test(type)">
       <img :src="require('../assets/zip.svg')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
-    <div class="zip" v-else-if="type.includes('exe')">
+    <div
+      class="exe"
+      v-else-if="file_name.includes('exe') && type.includes('octet-stream')"
+    >
       <img :src="require('../assets/exe.svg')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
-    <div class="zip" v-else-if="type.includes('pdf')">
+    <div class="pdf" v-else-if="type.includes('pdf')">
       <img :src="require('../assets/pdf.svg')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
-    <div class="zip" v-else-if="type.includes('doc')">
+    <div
+      class="doc"
+      v-else-if="type.includes('msword') && file_name.includes('doc')"
+    >
       <img :src="require('../assets/doc.svg')" />
       <i class="el-icon-star-on" v-if="isCollection"></i>
     </div>
@@ -58,9 +64,18 @@ export default {
       type: Object,
     },
   },
+  data() {
+    return {
+      zip: /zip|x-zip-compressed/g,
+      rar: /x-rar-compressed/g,
+    };
+  },
   computed: {
     type() {
       return this.item.type;
+    },
+    file_name() {
+      return this.item.file_name;
     },
     isCollection() {
       return this.item.isCollection;
@@ -76,12 +91,7 @@ export default {
 .files {
   width: 100px;
   height: 100px;
-  .img,
-  .video,
-  .audio,
-  .folder_img,
-  .text,
-  .zip {
+  & > div {
     width: 100px;
     height: 100px;
     text-align: center;

@@ -25,6 +25,18 @@
 
 在线预览（目前只支持video/audio/image）
 
+
+
+新增一些文件类型展示
+
+- pdf doc exe txt
+
+![image-20220711161436803](images/image-20220711161436803.png)
+
+
+
+![image-20220711161346643](images/image-20220711161346643.png)
+
 image
 
 ![image-20220707210714499](images/image-20220707210714499.png)
