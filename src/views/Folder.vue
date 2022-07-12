@@ -150,7 +150,7 @@ import {
 } from "../api/file";
 import download_file from "../utils/download";
 import { format } from "../utils/data";
-import FileType from "./File_type.vue";
+import FileType from "./FileType/File_type.vue";
 import uploadFileMixin from "./mixins/file";
 import { mapActions, mapMutations, mapState } from "vuex";
 import { copy } from "../utils/clipboard";
