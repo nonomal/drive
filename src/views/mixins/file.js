@@ -5,70 +5,97 @@ import { mapActions } from 'vuex'
 let uploadFileMixin = {
     data() {
         return {
-            loading: false,
             chunkSize: 1024 * 1024,
-            partList: [],
-            total: 0,
-            index: 0,
-            upload_name: "",
-            upload_Ele: false,
-            percentage: 0,
+            taskLength: 0,
+            loaded: 0,
         }
     },
     methods: {
+        // 检查剩余空间
+        checkedAbleUpload() {
+            let { drive_used, drive_size } = this.userInfo;
+            if (drive_used >= drive_size) {
+                this.$message.error("当前账户可用空间不足");
+                return false;
+            } else {
+                return true
+            }
+        },
+
+        // 切片
+        cutFileSlice(files) {
+            let allFileSlice = []
+            this.taskLength = files.length
+            Array.from(files).forEach(file => {
+                let fileName = file.name
+                let start = 0;
+                let total = 0
+                let currentFile = []
+                let fileSize = file.size
+                let fileType = file.type
+                while (start <= fileSize) {
+                    start = total * this.chunkSize;
+                    let [f_name, f_ext] = fileName.split(".");
+                    let blob = file.slice(start, start + this.chunkSize);
+                    let blob_name = `${f_name}.${total}.${f_ext}`;
+                    let bolo_file = new File([blob], blob_name);
+                    currentFile.push(bolo_file);
+                    total += 1;
+                    if (start >= fileSize) {
+                        break;
+                    }
+                }
+                allFileSlice.push({
+                    fileInfo: {
+                        fileName,
+                        fileSize,
+                        fileType,
+                        percentage: 0
+                    },
+                    total,
+                    currentFile
+                })
+            })
+            return allFileSlice
+        },
         // 上传文件
         async upload(e) {
             var file = e.target.files[0];
             if (!file) return;
-            let { drive_used, drive_size } = this.userInfo;
-            if (drive_used >= drive_size)
-                return this.$message.error("当前账户可用空间不足");
+            if (!this.checkedAbleUpload()) return
 
-            this.upload_name = file.name;
-            let start = 0;
-            while (start <= file.size) {
-                start = this.total * this.chunkSize;
-                let [f_name, f_ext] = file.name.split(".");
-                let blob = file.slice(start, start + this.chunkSize);
-                let blob_name = `${f_name}.${this.total}.${f_ext}`;
-                let bolo_file = new File([blob], blob_name);
-                this.partList.push(bolo_file);
-                this.total += 1;
-                if (start >= file.size) {
-                    break;
-                }
-            }
-            this.sendRequest(e);
+            let fileParts = this.cutFileSlice(e.target.files)
+            this.$Progress.init(fileParts)
+            this.sendRequest(fileParts);
         },
         // 更新上传进度
-        progressPerce(index) {
-            let result = parseInt((index / this.total) * 100);
-            this.percentage = result == 100 ? 99 : result;
+        progressPerce(index, total) {
+            let result = parseInt((index / total) * 100);
+            return result == 100 ? 99 : result;
         },
         // 发送上传请求
-        async sendRequest(e) {
-            this.upload_Ele = true;
-            this.index = 0;
-            let list = this.partList,
-                listLength = list.length;
-            for (let i = 0; i < listLength; i++) {
-                let formData = new FormData();
-                formData.append("file", list.shift());
-                await uploadFiles(formData);
-                this.index++;
-                this.progressPerce(this.index);
-            }
-            setTimeout(() => {
-                this.mergeFile(e);
-            }, 4000);
+        async sendRequest(fileParts) {
+            fileParts.forEach(async filePart => {
+                let index = 0;
+                let total = filePart.total
+                let list = filePart.currentFile,
+                    listLength = list.length;
+                for (let i = 0; i < listLength; i++) {
+                    let formData = new FormData();
+                    formData.append("file", list.shift());
+                    await uploadFiles(formData);
+                    index++;
+                    filePart.fileInfo.percentage = this.progressPerce(index, total);
+                    this.$Progress.update(fileParts)
+                }
+                setTimeout(() => {
+                    this.mergeFile(filePart.fileInfo);
+                }, 4000);
+            })
         },
         // 合并文件
-        mergeFile(e) {
-            var files = e.target.files[0];
-            var file_name = files.name;
-            var file_id = getMD5(file_name);
-            var file_size = files.size;
-            var file_type = files.type;
+        mergeFile({ fileName, fileSize, fileType }) {
+            var file_id = getMD5(fileName);
             let time = format("YYYY-MM-DD hh:mm:ss");
             let { drive_id } = this.userInfo;
             let parent_file_id = this.parent_file_id;
@@ -76,23 +103,23 @@ let uploadFileMixin = {
             merge({
                 drive_id,
                 file_id,
-                file_name,
+                file_name: fileName,
                 parent_file_id,
-                file_size,
-                file_type,
+                file_size: fileSize,
+                file_type: fileType,
                 parent_folder,
                 created_at: time,
                 updated_at: time,
             }).then(async (res) => {
+                this.loaded++;
                 await this.getUserDrive();
+                if (this.loaded == this.taskLength) {
+                    this.$Progress.close()
+                }
+                this.$message.success(res.message);
                 if (this.getUserFile) return this.getUserFile()
                 this.$refs.folder.getUserFile();
-                this.$message.success(res.message);
             });
-            this.upload_Ele = false;
-            this.total = 0;
-            this.index = 0;
-            this.percentage = 0;
         },
         ...mapActions("user", ["getUserDrive"]),
     }

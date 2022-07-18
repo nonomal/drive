@@ -143,6 +143,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.audioEle = this.$refs.audio;
+      this.sliderEle = this.$refs.slider;
       if (!this.audioEle) return;
       this.audioEle.addEventListener("canplaythrough", this.init_audio_time);
       this.audioEle.addEventListener("end", this.audioEnd);

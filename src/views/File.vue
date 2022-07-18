@@ -10,6 +10,7 @@
           type="file"
           ref="fileEle"
           @change="upload"
+          multiple="true"
           style="display: none"
         />
         <el-button
@@ -147,23 +148,6 @@
         </span>
       </el-dialog>
     </div>
-
-    <transition name="slide-to-right">
-      <div class="upload_file_state" v-loading="loading" v-if="upload_Ele">
-        <el-card class="box-card">
-          <span>上传进度：</span>
-          <div v-for="o in 1" :key="o" class="item">
-            <span class="file_name">{{ upload_name }}</span>
-            <el-progress
-              v-if="!isNaN(percentage)"
-              :percentage="percentage"
-              style="width: 280px; display: inline-block; margin-left: 10px"
-            ></el-progress>
-          </div>
-          <p>tip：上传过程中不要离开此页面</p>
-        </el-card>
-      </div>
-    </transition>
   </div>
 </template>
 
@@ -191,7 +175,6 @@ export default {
         dir_name: "新建文件夹",
         type: "folder",
       },
-
       searchFileItem: [],
     };
   },
@@ -311,14 +294,6 @@ export default {
 .slide-fade-enter,
 .slide-fade-leave-to {
   transform: translateX(10px);
-  opacity: 0;
-}
-.slide-to-right-enter-active,
-.slide-to-right-leave-active {
-  transition: all 0.5s ease;
-}
-.slide-to-right-enter,
-.slide-to-right-leave-to {
   opacity: 0;
 }
 

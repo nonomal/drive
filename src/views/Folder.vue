@@ -1,6 +1,6 @@
 <template>
   <div class="folder" ref="folder">
-    <div class="boundary" v-if="fileList.length">
+    <div class="boundary" v-if="isEmpty">
       <el-row :gutter="20" v-for="(ele, key) in fileList" :key="key">
         <el-col :span="3" v-for="(item, index) in ele" :key="index">
           <div
@@ -36,9 +36,13 @@
           type="file"
           ref="fileEle"
           @change="upload"
+          multiple="true"
           style="display: none"
         />
-        <el-button type="primary" @click="$refs.fileEle.click()"
+        <el-button
+          type="primary"
+          @click="$refs.fileEle.click()"
+          v-if="favorite == 'file'"
           >上传文件</el-button
         >
       </el-empty>
@@ -211,6 +215,9 @@ export default {
       "pageLimit",
       "parent_folder",
     ]),
+    isEmpty() {
+      return this.fileList.length > 0 ? true : false;
+    },
   },
   watch: {
     searchFileItem() {
