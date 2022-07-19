@@ -192,7 +192,7 @@ export default {
       },
       imageData: [],
       showCol: 10,
-      loading: false,
+      loading: true,
     };
   },
   mixins: [uploadFileMixin],
