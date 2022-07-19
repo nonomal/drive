@@ -24,8 +24,8 @@ function setVueLazy(Vue, vueLazyConfig) {
         Vue.use(VueLazyload, {
             loading: require('./assets/loading.gif'),
             error: require('./assets/error.png'),
-            perload: 1,
-            attempt: 1,
+            perload: 1.3,
+            attempt: 3,
             adapter: {
                 loaded({ el }) {
                     if (el.classList.contains('show-big-pic')) {
