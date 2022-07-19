@@ -20,10 +20,9 @@ export default {
   computed: {
     percentage() {
       let { drive_used, drive_size } = this.userInfo;
-      let result = parseInt((drive_used / drive_size) * 100) / 100;
-      if (result == 0.07) result = 0.08;
+      let result = (drive_used / drive_size).toFixed(2);
       this.percentageStatua(result);
-      return result > 1 ? 1 : result;
+      return result * 100;
     },
     ...mapState("user", ["userInfo"]),
     ...mapState("sideBar", ["rules", "routers", "isCollapse"]),
@@ -45,10 +44,6 @@ export default {
       } else {
         this.customColor = "#F56C6C";
       }
-    },
-
-    format(percentage) {
-      return `${percentage}%`;
     },
 
     // 上传头像
@@ -178,12 +173,15 @@ export default {
     <div class="footer" v-show="!isCollapse">
       <div class="content">
         <span>
-          {{ userInfo.drive_used | getBToMB }}
-          MB/{{ userInfo.drive_size | getBToGB }}GB</span
+          {{ userInfo.drive_used | getBToMB }}MB /
+          {{ userInfo.drive_size | getBToGB }}GB</span
         >
+
         <el-progress
           v-if="!isNaN(percentage)"
-          :percentage="percentage * 100"
+          :text-inside="true"
+          :stroke-width="15"
+          :percentage="percentage"
           :color="customColor"
           class="jindutiao"
         ></el-progress>
@@ -295,6 +293,16 @@ export default {
       padding: 0 10px 10px 20px;
       font-size: 13px;
       border-bottom: 1px solid #444;
+      & /deep/ .el-progress__text {
+        width: 34px;
+        overflow: hidden;
+        &::after {
+          position: absolute;
+          content: "%";
+          top: 0;
+          right: -2px;
+        }
+      }
       .jindutiao /deep/ i {
         display: none;
       }

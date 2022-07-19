@@ -216,7 +216,7 @@ export default {
       "parent_folder",
     ]),
     isEmpty() {
-      return this.fileList.length > 0 ? true : false;
+      return this.List?.length > 0 ? true : false;
     },
   },
   watch: {
@@ -491,24 +491,32 @@ export default {
     // 重命名
     modify_name() {
       this.dialogRename = true;
-      let filename = this.List[this.clickIndex].file_name;
-      let index = filename.lastIndexOf(".");
-      this.reName.prefixname = filename.slice(0, index);
-      this.reName.extname = filename.slice(index);
+      let { file_name: filename, type } = this.List[this.clickIndex];
+      if (type == "folder") {
+        this.reName.prefixname = filename;
+      } else {
+        let index = filename.lastIndexOf(".");
+        this.reName.prefixname = filename.slice(0, index);
+        this.reName.extname = filename.slice(index);
+      }
     },
 
     // 重命名
     async re_name() {
       let { drive_id } = this.userInfo;
       let { file_id, type } = this.List[this.clickIndex];
+      let filename = "";
       let { extname, prefixname } = this.reName;
-      let filename = prefixname + extname;
+      if (type == "folder") {
+        filename = prefixname;
+      } else {
+        filename = prefixname + extname;
+      }
       let { status, message } = await modify({
         drive_id,
         file_id,
         filename,
         type,
-        updated_at: format("YYYY-MM-DD hh:mm:ss"),
       });
       if (status == 200) {
         this.$message.success(message);
@@ -524,7 +532,6 @@ export default {
       move({
         drive_id: this.userInfo.drive_id,
         parent_file_id: this.currentFileId,
-        updated_at: format("YYYY-MM-DD hh:mm:ss"),
         file_id: this.List[this.clickIndex].file_id,
       })
         .then((res) => {

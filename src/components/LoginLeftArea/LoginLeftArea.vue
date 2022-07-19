@@ -47,10 +47,10 @@ export default {
     text-align: center;
     margin-top: 4px;
     font-size: 14px;
-    overflow: hidden;
-    white-space: normal;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    height: 20px;
   }
   .author {
     text-align: right;

@@ -153,7 +153,6 @@
 
 <script>
 import { mkdir, getSearch } from "../api/file";
-import { format } from "../utils/data";
 import { getMD5 } from "../utils/cryto";
 import Folder from "./Folder.vue";
 import { mapMutations, mapState } from "vuex";
@@ -173,7 +172,6 @@ export default {
       centerDialogVisible: false,
       dirParams: {
         dir_name: "新建文件夹",
-        type: "folder",
       },
       searchFileItem: [],
     };
@@ -199,8 +197,7 @@ export default {
     // 创建文件夹
     mkdir_btn() {
       let { drive_id } = this.userInfo;
-      let time = format("YYYY-MM-DD hh:mm:ss");
-      let { dir_name, type } = this.dirParams;
+      let { dir_name } = this.dirParams;
       let parent_file_id = this.parent_file_id;
       let file_id = getMD5(parent_file_id + dir_name);
       mkdir({
@@ -208,9 +205,6 @@ export default {
         parent_file_id,
         file_id,
         filename: dir_name,
-        type,
-        created_at: time,
-        updated_at: time,
       }).then(() => {
         this.$refs.folder.getUserFile();
       });
@@ -275,13 +269,13 @@ export default {
   },
   mounted() {
     this.menuEle = this.$refs.fileMenu;
-    // this.$alert(
-    //   "<p>感谢诸位的支持与理解，祝大家生活愉快。</p><br/><p>感谢诸位的支持与理解，祝大家生活愉快。</p>",
-    //   "消息提醒",
-    //   {
-    //     dangerouslyUseHTMLString: true,
-    //   }
-    // );
+    this.$alert(
+      "<div>文件不会长期存储，请注意进行文件备份或下载。</div>",
+      "消息提醒",
+      {
+        dangerouslyUseHTMLString: true,
+      }
+    );
   },
 };
 </script>

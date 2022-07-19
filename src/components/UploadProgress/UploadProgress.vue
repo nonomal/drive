@@ -56,7 +56,7 @@ export default {
     bottom: 20px;
     .item-inner {
       width: 380px;
-      height: 130px;
+      max-height: 130px;
       overflow-y: auto;
       &::-webkit-scrollbar {
         display: none;
