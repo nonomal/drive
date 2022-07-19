@@ -1,5 +1,5 @@
 <template>
-  <div class="folder" ref="folder">
+  <div class="folder" ref="folder" v-loading="loading">
     <div class="boundary" v-if="isEmpty">
       <el-row :gutter="20" v-for="(ele, key) in fileList" :key="key">
         <el-col :span="3" v-for="(item, index) in ele" :key="index">
@@ -192,6 +192,7 @@ export default {
       },
       imageData: [],
       showCol: 10,
+      loading: false,
     };
   },
   mixins: [uploadFileMixin],
@@ -336,6 +337,7 @@ export default {
           this.DOMAIN = DOMAIN;
           this.SET_FILE_TOTAL(fileList && res.fileList.length);
           this.formatFileData(fileList);
+          this.loading = false;
         })
         .catch((err) => {
           console.debug(err);
@@ -435,6 +437,7 @@ export default {
     open(item) {
       let { type, file_id, file_name } = item;
       if (type == "folder") {
+        this.loading = true;
         this.getUserFile(this.userInfo.drive_id, file_id);
         this.SET_PARENT_FILE_ID({
           parent_file_id: file_id,
