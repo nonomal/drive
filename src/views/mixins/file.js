@@ -1,5 +1,4 @@
 import { uploadFiles, merge } from '../../api/file'
-import { format } from "../../utils/data";
 import { getMD5 } from "../../utils/cryto";
 import { mapActions } from 'vuex'
 let uploadFileMixin = {
@@ -32,7 +31,6 @@ let uploadFileMixin = {
                 let total = 0
                 let currentFile = []
                 let fileSize = file.size
-                let fileType = file.type
                 while (start <= fileSize) {
                     start = total * this.chunkSize;
                     let [f_name, f_ext] = fileName.split(".");
@@ -48,8 +46,6 @@ let uploadFileMixin = {
                 allFileSlice.push({
                     fileInfo: {
                         fileName,
-                        fileSize,
-                        fileType,
                         percentage: 0
                     },
                     total,
@@ -94,9 +90,8 @@ let uploadFileMixin = {
             })
         },
         // 合并文件
-        mergeFile({ fileName, fileSize, fileType }) {
+        mergeFile({ fileName }) {
             var file_id = getMD5(fileName);
-            let time = format("YYYY-MM-DD hh:mm:ss");
             let { drive_id } = this.userInfo;
             let parent_file_id = this.parent_file_id;
             let parent_folder = this.parent_folder
@@ -105,11 +100,7 @@ let uploadFileMixin = {
                 file_id,
                 file_name: fileName,
                 parent_file_id,
-                file_size: fileSize,
-                file_type: fileType,
                 parent_folder,
-                created_at: time,
-                updated_at: time,
             }).then(async (res) => {
                 this.loaded++;
                 await this.getUserDrive();

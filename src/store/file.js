@@ -2,7 +2,7 @@ import { getFileTotal } from '../api/file'
 import app from '../main'
 const state = {
     parent_file_id: "root",
-    parent_folder: '',
+    parent_folder: 'root',
     video_info: null,
     isOpen: false,
     favorite: 'file',

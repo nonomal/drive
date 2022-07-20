@@ -458,7 +458,9 @@ export default {
         let currentIndex = this.imageData.findIndex(
           (info) => info.file_id == item.file_id
         );
-        this.$photoview(this.getCurrentImageData(currentIndex), currentIndex);
+        let ss = this.getCurrentImageData(currentIndex);
+        console.log(ss);
+        this.$photoview(ss, currentIndex);
       }
     },
 
@@ -487,7 +489,7 @@ export default {
     // 获取文件链接
     async getDownload_url() {
       let { DOMAIN, download_url } = this.List[this.clickIndex];
-      let realDownload_url = DOMAIN + "/" + download_url;
+      let realDownload_url = encodeURI(DOMAIN + "/" + download_url);
       copy.call(this, realDownload_url);
     },
 
