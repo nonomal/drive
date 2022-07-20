@@ -195,7 +195,7 @@ export default {
         </div>
         <div class="set">
           <el-popover placement="top" trigger="click" class="popover">
-            <i slot="reference" class="iconfont el-icon-setting"></i>
+            <i slot="reference" class="el-icon-setting"></i>
             <ul class="menu">
               <li @click="handel">更换头像</li>
               <input
@@ -310,6 +310,10 @@ export default {
     .user_info {
       padding: 20px 10px 20px 10px;
       display: flex;
+      & > div {
+        flex-shrink: 0;
+        flex-grow: 0;
+      }
       .head {
         width: 50px;
         height: 50px;

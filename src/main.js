@@ -15,6 +15,9 @@ Vue.use(PhotoView, true)
 Vue.use(directives)
 Vue.use(UploadProgress)
 Vue.config.productionTip = false
+
+import './assets/css/iconfont.css'
+
 import './elementUse'
 let app = new Vue({
   router,

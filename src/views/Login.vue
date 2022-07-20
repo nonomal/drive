@@ -199,7 +199,7 @@ export default {
         ],
         nickname: [
           { required: true, message: "昵称是必须的", trigger: "blur" },
-          { min: 3, max: 10, message: "昵称再长些呢！", trigger: "blur" },
+          { min: 3, max: 10, message: "3-8位字符串", trigger: "blur" },
         ],
         yanzhengma: [
           { required: true, message: "验证码是必须的", trigger: "blur" },
