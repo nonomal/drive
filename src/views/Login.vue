@@ -221,10 +221,11 @@ export default {
     sendAnPwd() {
       let reg = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/g;
       let { username, emailSelect } = this.register;
-      if (reg.test(username + emailSelect)) {
+      let account = username + emailSelect;
+      if (reg.test(account)) {
         this.isLoading = true;
         this.isClick = true;
-        sendPwd({ username: this.register.username }).then((res) => {
+        sendPwd({ username: account }).then((res) => {
           this.$message({ message: res.message, type: "success" });
           this.isLoading = false;
           this.setTipText();
@@ -292,9 +293,10 @@ export default {
       let timer = setInterval(() => {
         this.tipText = second;
         second -= 1;
-        if (second < 0) {
+        if (second <= 0) {
           clearInterval(timer);
           this.isClick = false;
+          this.tipText = "重新获取";
         }
       }, 1000);
     },
