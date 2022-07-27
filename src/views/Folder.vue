@@ -458,20 +458,23 @@ export default {
         let currentIndex = this.imageData.findIndex(
           (info) => info.file_id == item.file_id
         );
-        let ss = this.getCurrentImageData(currentIndex);
-        console.log(ss);
-        this.$photoview(ss, currentIndex);
+        this.$photoview(this.getCurrentImageData(currentIndex), currentIndex);
       }
     },
 
     getCurrentImageData(currentIndex) {
-      let middle = this.showCol / 2;
-      let start = currentIndex - middle,
-        end = currentIndex + middle,
-        leftValue = Math.abs(start);
-      if (start < 0) start = 0;
-      if (leftValue != 0) end += leftValue;
-      return this.imageData.slice(start, end);
+      let imageLength = this.imageData.length;
+      if (imageLength < 10) {
+        return this.imageData;
+      } else {
+        let middle = this.showCol / 2;
+        let start = currentIndex - middle,
+          end = currentIndex + middle,
+          leftValue = Math.abs(start);
+        if (start < 0) start = 0;
+        if (leftValue != 0) end += leftValue;
+        return this.imageData.slice(start, end);
+      }
     },
 
     // 下载
@@ -537,6 +540,7 @@ export default {
       move({
         drive_id: this.userInfo.drive_id,
         parent_file_id: this.currentFileId,
+        parent_folder: this.parent_folder,
         file_id: this.List[this.clickIndex].file_id,
       })
         .then((res) => {

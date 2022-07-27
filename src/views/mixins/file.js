@@ -91,6 +91,7 @@ let uploadFileMixin = {
         },
         // 合并文件
         mergeFile({ fileName }) {
+            console.log(this);
             var file_id = getMD5(fileName);
             let { drive_id } = this.userInfo;
             let parent_file_id = this.parent_file_id;
